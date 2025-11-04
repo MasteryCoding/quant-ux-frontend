@@ -1,14 +1,7 @@
 <template>
   <div class="MatcCanvasPage" id="CanvasNode" @wheel="onMouseWheel">
-    <template v-if="selectedViewMode === 'Design'">
-        <DesignToolbar ref="toolbar" :pub="pub"  @viewModeChange="onVieModeChange" />
-        <DesignCanvas ref="canvas" @viewport="onViewPortChange" :viewport="viewport" />
-    </template>
-    <template v-if="selectedViewMode === 'Heatmap'">
-        <AnalyticToolbar ref="toolbar" @viewModeChange="onVieModeChange" />
-        <AnalyticCanvas ref="canvas" @viewport="onViewPortChange" :viewport="viewport"/>
-    </template>
- 
+    <DesignToolbar ref="toolbar" :pub="pub"  @viewModeChange="onVieModeChange" />
+    <DesignCanvas ref="canvas" @viewport="onViewPortChange" :viewport="viewport" />
   </div>
 </template>
 
@@ -36,24 +29,18 @@ import Services from "services/Services";
 import Logger from "common/Logger";
 import CollabSession from '../../canvas/controller/CollabSession'
 
-import AnalyticToolbar from 'canvas/analytic/AnalyticToolbar'
-import AnalyticCanvas from 'canvas/analytic/AnalyticCanvas'
-import AnalyticController from 'canvas/analytic/AnalyticController'
-
 export default {
   name: "Design",
   mixins: [DojoWidget],
   data: function() {
     return {
-      selectedViewMode: '',
+      selectedViewMode: 'Design',
       viewport: null
     };
   },
   components: {
     'DesignToolbar': Toolbar,
-    'DesignCanvas': Canvas,
-    'AnalyticToolbar': AnalyticToolbar,
-    'AnalyticCanvas': AnalyticCanvas
+    'DesignCanvas': Canvas
   },
   computed: {
     pub() {
@@ -84,11 +71,7 @@ export default {
       }
     },
     load (mode) {
-      if (mode === 'Design') {
-        this.loadData(mode)
-      } else {
-      this.loadAnlyticData(mode)
-      }
+      this.loadData(mode)
     },
     loadData(mode) {
       let id = this.$route.params.id;
@@ -113,34 +96,6 @@ export default {
       });
     },
 
-    loadAnlyticData (mode) {
-      let id = this.$route.params.id
-      this.logger.log(0, 'loadAnlyticData', 'enter', id)
-      Promise.all([
-        this.loadApp(id),
-        this.loadTest(id),
-        this.loadEvents(id),
-        this.loadAnnotations(id),
-        this.loadInvitations(id)
-      ]).then(values => {
-
-        this.cache.app = values[0]
-        this.cache.test = values[1]
-        this.cache.events = values[2]
-        this.cache.annotation = values[3]
-        this.cache.inivitations = values[4]
-
-        const invitations = values[4];
-        const hash = this.getHashFromInvitation(invitations)
-        
-        this.selectedViewMode = mode
-        this.$nextTick( () => {
-          this.buildAnalyticCanvas(values[0], values[1], values[2], values[3], hash)
-        })
-
-      })
-    },
-
     getHashFromInvitation(invitations) {
       const temp = {};
       for (let key in invitations) {
@@ -155,40 +110,14 @@ export default {
       this.logger.log(2, 'loadAll', 'enter', id)
       Promise.all([
         this.loadApp(id),
-        this.loadTest(id),
-        this.loadEvents(id),
-        this.loadAnnotations(id),
         this.loadInvitations(id),
         this.loadCommands(id)
       ]).then(values => {
 
         this.cache.app = values[0]
-        this.cache.test = values[1]
-        this.cache.events = values[2]
-        this.cache.annotation = values[3]
-        this.cache.inivitations = values[4]
-        this.cache.commands = values[5]
+        this.cache.inivitations = values[1]
+        this.cache.commands = values[2]
       })
-    },
-    loadTest (id) {
-      if (this.cache.test) {
-        return this.cache.test
-      }
-      return this.modelService.findTest(id)
-    },
-
-    loadEvents (id) {
-      if (this.cache.events) {
-        return this.cache.events
-      }
-      return this.modelService.findEvents(id)
-    },
-
-    loadAnnotations (id) {
-      if (this.cache.annotation) {
-        return this.cache.annotation
-      }
-      return this.modelService.findSessionAnnotations(id)
     },
 
     loadApp (id) {
@@ -318,81 +247,8 @@ export default {
 
 
 
-    buildAnalyticCanvas (model, test, events, annotation, hash) {
-      this.logger.log(-1, 'buildAnalyticCanvas', 'enter', hash)
-
-      const canvas = this.$refs.canvas
-      const toolbar = this.$refs.toolbar
-
-      const controller = new AnalyticController()
-      const service = Services.getModelService()
-
-      /**
-       * model factory
-       */
-       const factory = new ModelFactory();
-      factory.setModel(model);
-
-      /**
-       * render factory
-       */
-       const renderFactory = new RenderFactory();
-      renderFactory.setModel(model);
-      renderFactory.setHash(hash)
-
-
-      /**
-       * Dependency injection
-       */
-      controller.setModelService(service)
-   
-      controller.setToolbar(toolbar);
-      controller.setModelFactory(factory);
-
-
-      toolbar.setController(controller);
-      toolbar.setCanvas(canvas);
-      toolbar.setUser(this.user);
-      toolbar.setModelFactory(factory);
-      toolbar.setModelService(service)
-      toolbar.setEvents(events);
-      toolbar.setAnnotation(annotation);
-      toolbar.setTest(test);
-      toolbar.setCommentService(Services.getCommentService());
-      toolbar.setPublic(this.pub)
-
-      canvas.setController(controller);
-      canvas.setToolbar(toolbar);
-      canvas.setRenderFactory(renderFactory);
-      canvas.setModelFactory(factory);
-      canvas.setCommentService(Services.getCommentService())
-      canvas.setUser(this.user)
-      //=canvas.setEvents(events);
-      canvas.setAnnotation(annotation);
-      canvas.setTest(test);
-
-      // wire shit together
-      this.tempOwn(on(toolbar, "newComment", lang.hitch(canvas, "addComment")));
-
-      let startScreen = null;
-      for(let screenID in model.screens){
-        const screen = model.screens[screenID];
-        if (screen.props && screen.props.start){
-            startScreen = screenID;
-            break;
-        }
-      }
-      /**
-       * controller will render screen
-       */
-      controller.setModel(model, startScreen);
-    },
     getModeFromRoute() {
-      if (this.$route.meta.viewMode === 'Heatmap') {
-        return 'Heatmap'
-      } else {
-        return'Design'
-      }
+      return 'Design'
     }
 
   },

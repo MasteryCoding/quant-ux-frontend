@@ -1,23 +1,16 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import VueI18n from 'vue-i18n'
+import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
+import VueI18n from 'vue-i18n';
 
-import Services from 'services/Services'
-
+import Services from 'services/Services';
 
 async function start() {
-  await Services.initConfig()
-  let conf = await Services.getConfig()
-  if (conf.auth === 'keycloak') {
-    const keycloakService = Services.getUserService()
-    await keycloakService.setConf(conf)
-    await keycloakService.init();
-  }
+  await Services.initConfig();
 
-  Vue.use(VueI18n)
-  Vue.config.productionTip = false
-  
+  Vue.use(VueI18n);
+  Vue.config.productionTip = false;
+
   new Vue({
     router,
     i18n: new VueI18n({
@@ -33,10 +26,8 @@ async function start() {
         'pt': require('./nls/pt_br.json')
       }
     }),
-    render: h => h(App)
-  }).$mount('#app')
-  
+    render: (h) => h(App)
+  }).$mount('#app');
 }
 
-start()
-
+start();

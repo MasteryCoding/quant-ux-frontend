@@ -6,7 +6,6 @@ import SymbolService from './SymbolService'
 import HelpService from './HelpService'
 import ImageService from './ImageService'
 import WebSocketService from './WebSocketService'
-import KeyCloakService from './KeyCloakService'
 import CommandService from './CommandService'
 import NotificationService from './NotificationService'
 import AIService from './AIService'
@@ -93,12 +92,8 @@ class Services {
     
 
     getUserService () {
-        if (this.config.auth === 'keycloak') {
-            return KeyCloakService
-        } else {
-            UserService.setToken(UserService.getToken())
-            return UserService   
-        }
+        UserService.setToken(UserService.getToken())
+        return UserService   
     }
 
     getSymbolService () {

@@ -3,9 +3,7 @@
      <div class="MatchImportDialog" @dragover="onDragEnter" @dragenter="onDragEnter" @dragleave="onDragLeave" @drop="onDrop">
         <div class="MatcToolbarTabs MatcToolbarTabsBig">
             <a @click="tab='images'" :class="{'MatcToolbarTabActive': tab === 'images'}">{{ getNLS('dialog.import.tab-images')}}</a>
-            <a @click="tab='figma'" :class="{'MatcToolbarTabActive': tab === 'figma'}">{{ getNLS('dialog.import.tab-figma')}}</a>
             <a @click="tab='zip'" :class="{'MatcToolbarTabActive': tab === 'zip'}">{{ getNLS('dialog.import.tab-zip')}}</a>
-            <a @click="tab='swagger'" :class="{'MatcToolbarTabActive': tab === 'swagger'}" v-if="hasSwagger">{{ getNLS('dialog.import.')}}</a>
             <a @click="tab='openai'" :class="{'MatcToolbarTabActive': tab === 'openai'}" v-if="hasOpenAI">{{ getNLS('dialog.import.tab-open-ai')}}</a>
  
         </div>
@@ -32,49 +30,6 @@
                         <span class="mdi mdi-file-code-outline"/>
                     </span>
                     <input type="file" @change="onZipChange" >
-                </div>
-            </div>
-
-
-            <div v-if="tab=== 'figma'">
-                <div class="MatchImportDialogCntr">
-
-                    <div v-if="!figmaPages">
-
-                        <div class="form-group ">
-                            <label>{{ getNLS('dialog.import.figma-key')}}
-                            <a target="figma" href="https://www.figma.com/developers/api#access-tokens">
-                                <span class="mdi mdi-help-circle"></span>
-                            </a>
-                            </label>
-                            <form autocomplete="off">
-                                <input type="password" autocomplete="off" class="form-control" v-model="figmaAcccessKey" />
-                            </form>
-                        </div>
-
-                        <div class="form-group">
-                            <label>{{ getNLS('dialog.import.figma-url')}}</label>
-                            <input type="text" class="form-control" v-model="figmaUrl" />
-                        </div>
-
-                    </div>
-
-                    <div v-else>
-                        <label>{{ getNLS('dialog.import.figma-select-page')}}</label>
-                        <div>
-                            <RadioBoxList :qOptions="figmaPages" @change="setSelectedFigmaPage" />
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div v-if="tab=== 'swagger'">
-                <div class="MatchImportDialogCntr">
-                      <div class="form-group">
-                            <label>{{ getNLS('dialog.import.open-api-url')}}</label>
-                            <input type="text" class="form-control" v-model="swaggerURL" />
-                        </div>
                 </div>
             </div>
 
@@ -111,8 +66,7 @@
         </div>
 
         <div class=" MatcButtonBar MatcMarginTop">
-            <a class=" MatcButton MatcButtonPrimary" v-if="hasContinue" @click.stop="onContinueFigma">{{ getNLS('btn.continue')}}</a>
-            <a class=" MatcButton MatcButtonPrimary" v-if="!isPublic && !hasContinue" @click.stop="onSave">{{ getNLS('btn.import')}}</a>
+            <a class=" MatcButton MatcButtonPrimary" v-if="!isPublic" @click.stop="onSave">{{ getNLS('btn.import')}}</a>
             <a class=" MatcLinkButton" @click.stop="onCancel">{{ getNLS('btn.cancel')}}</a>
         </div>
 
@@ -130,8 +84,6 @@ import Services from 'services/Services'
 import RadioBoxList from 'common/RadioBoxList'
 
 import ZipSevice from 'services/ZipService'
-import FigmaService from 'services/FigmaService'
-import SwaggerService from 'services/SwaggerService'
 
 export default {
     name: 'ImportDialog',
@@ -148,14 +100,7 @@ export default {
             errorMSG: '',
             progressMSG: '',
             progessPercent: 0,
-            figmaAcccessKey: '',
-            figmaUrl: '',
-            figmaPages: null,
-            figmaModel: null,
-            figmaSelectedPage: null,
-            swaggerURL: '',
             isPublic: false,
-            hasSwagger: false,
             hasOpenAI: false,
             openAIPrompt: ''
         }
@@ -205,21 +150,14 @@ export default {
         },
 
         async onSave () {
-            this.logger.log(-1, 'onSave', 'enter', this.figmaSelectedPage !== null)
+            this.logger.log(-1, 'onSave', 'enter')
             this.errorMSG = ""
             if (this.tab === 'images') {
                 this.tab = 'progress'
                 await this.uploadImagesAndCreateScreens()
             }
-            if (this.tab === 'figma' && this.isValidFigmaConfig()) {
-                this.tab = 'progress'
-                await this.importFigma(this.figmaAcccessKey, this.figmaUrl)
-            }
             if (this.tab === 'zip') {
                 await this.importZip()
-            }
-            if (this.tab === 'swagger') {
-                await this.loadSwagger()
             }
             if (this.tab === 'openai') {
                 await this.importOpenAI()
@@ -228,234 +166,6 @@ export default {
 
         async importOpenAI () {
             this.logger.log(-1, 'loadSwagger', 'enter', this.openAIPrompt)
-        },
-        async loadSwagger () {
-            this.logger.log(-1, 'loadSwagger', 'enter', this.swaggerURL)
-            if (this.swaggerURL) {
-                localStorage.setItem('quxSwaggerURL', this.swaggerURL)
-                try {
-                    const swaggerService = new SwaggerService()
-                    const [items, schemas] = await swaggerService.parseURL(this.swaggerURL)
-                    console.debug(items, schemas)
-                } catch (err) {
-                    this.errorMSG = this.getNLS('dialog.import.error-swagger-wrong_url') + ` (${err.message})`
-                }
-             
-            } else {
-                this.errorMSG = this.getNLS('dialog.import.error-swagger-no-url')
-            }
-        },
-
-        async onContinueFigma () {
-            this.logger.log(-1, 'onContinueFigma', 'enter', this.figmaSelectedPage !== null)
-            if (this.figmaSelectedPage) {
-                this.tab = 'progress'
-                await this.parseFigma(this.figmaAcccessKey, this.figmaUrl, this.figmaModel, this.figmaSelectedPage, this.model.screenSize)
-                this.$emit('save')
-            } else {
-                this.errorMSG = this.getNLS('dialog.import.error-figma-page')
-            }
-        },
-
-        isValidFigmaConfig () {
-            if (!this.figmaAcccessKey) {
-                this.errorMSG = this.getNLS('dialog.import.error-figma-key')
-                return false
-            }
-            if (!this.figmaUrl) {
-                this.errorMSG = this.getNLS('dialog.import.error-figma-url')
-                return false
-            }
-            if (this.figmaUrl.indexOf('https://www.figma.com') !== 0) {
-                this.errorMSG = this.getNLS('dialog.import.error-figma-url')
-                return false
-            }
-            if (!this.getFigmaFileKey(this.figmaUrl)) {
-                this.errorMSG = this.getNLS('dialog.import.error-figma-url')
-                return false
-            }
-            return true
-        },
-
-        getFigmaFileKey (url) {
-            const parts = url.split('/')
-            if (parts.length >= 5) {
-                return parts[4]
-            }
-        },
-
-        resetFigma () {
-            this.logger.log(-1, 'resetFigma', 'enter')
-            this.figmaPages = null
-            this.figmaModel = null
-            this.figmaSelectedPage = null
-            this.hasContinue = false
-        },
-
-        setSelectedFigmaPage (value) {
-            this.logger.log(-1, 'setSelectedFigmaPage', 'enter', value)
-            this.figmaSelectedPage = value
-        },
-
-        async importFigma (accessKey, url) {
-            this.logger.log(-1, 'importFigma', 'enter', url)
-
-            localStorage.setItem('quxFigmaAccessKey', accessKey)
-            localStorage.setItem('quxFigmaUrl', url)
-            let fileId = this.getFigmaFileKey(url)
-            console.debug(fileId)
-
-            try {
-                this.setProgress(0, 'dialog.import.figma-progress-file')
-
-                let figmaService = new FigmaService(accessKey)
-                let fModel = await figmaService.get(fileId)       
-                if (fModel) {
-                    this.logger.log(-1, 'importFigma', 'fModel', fModel)
-                    this.figmaPages = figmaService.getPages(fModel)
-                    this.figmaModel = fModel
-
-                    /**
-                     * Check now if we need to show the 2nd wizard step
-                     */
-                    if (this.figmaPages.length === 1) {
-                        this.figmaSelectedPage = this.figmaPages[0].id
-                        await this.parseFigma(accessKey, url, this.figmaModel, this.figmaSelectedPage, this.model.screenSize)
-                        this.$emit('save')
-                    } else {
-                        /**
-                         * show the page selection page
-                         */
-                        this.hasContinue = true
-                        this.tab = 'figma'
-                    }
-
-                } else {
-                    throw new Error('Could not download figma. Servivce returned null')
-                }
-
-            } catch (err) {
-                console.debug(err.stack)
-                this.logger.error('importFigma', 'Cannot import figma')
-                this.logger.sendError(err)
-                this.errorMSG = this.getNLS('dialog.import.error-figma-load') + ` (${err.message})`
-                this.tab = 'figma'
-            }
-        },
-
-        async parseFigma (accessKey, url, fModel, figmaSelectedPage, screenSize, importChildren = false) {
-            this.logger.log(-1, 'parseFigma', 'enter', url)
-
-            try {
-                let fileId = this.getFigmaFileKey(url)
-                let figmaService = new FigmaService(accessKey)
-                let model = await figmaService.parse(fileId, fModel, importChildren, screenSize, [figmaSelectedPage])
-
-                if (model) {
-
-                    /**
-                     * Download all the images
-                     */
-                    let vectorWidgets = this.getImagesWithFigmaImage(model, importChildren)
-                    await this.downloadFigmaImages(vectorWidgets)
-
-                    let minX = 1000000
-                    let minY = 1000000
-                    Object.values(model.screens).forEach(screen => {
-                        minX = Math.min(minX, screen.x)
-                        minY = Math.min(minY, screen.y)
-                    })
-
-                    /**
-                     * Set to correct position
-                     */
-                    let pos = this.getCanvasCenter()
-                    let offsetX = pos.x - minX
-                    let offsetY = pos.y - minY
-                    Object.values(model.screens).forEach(screen => {
-                        screen.x += offsetX
-                        screen.y += offsetY
-                        return screen
-                    })
-                    Object.values(model.widgets).forEach(widget => {
-                        widget.x += offsetX
-                        widget.y += offsetY
-                        return widget
-                    })
-
-                    this.controller.addScreensAndWidgets(model);
-                } else {
-                    this.logger.error('importFigma', 'Cannot partse figma')
-                    this.logger.sendError(new Error('Could not parse figma'))
-                    this.errorMSG = this.getNLS('dialog.import.error-figma-load')
-                    this.tab = 'figma'
-                }
-            } catch (err) {
-                this.logger.error('importFigma', 'Cannot partse figma', err)
-                this.logger.sendError(err)
-                this.errorMSG = this.getNLS('dialog.import.error-figma-load')
-                this.tab = 'figma'
-            }
-
-            this.resetFigma()
-        },
-
- 
-
-        getImagesWithFigmaImage (model, importChildren) {
-            if (importChildren) {
-                return Object.values(model.widgets).filter(w => w.props && w.props.figmaImage)
-            } else {
-                return Object.values(model.screens).filter(w => w.props && w.props.figmaImage)
-            }
-        },
-
-        async downloadFigmaImages (vectorWidgets) {
-            this.logger.log(-1, 'importFigma', 'downloadFigmaImages', vectorWidgets)
-            this.setProgress(20)
-            let total = vectorWidgets.length * 2;
-            let done = 0
-            let imageService = Services.getImageService()
-            let url = '/rest/images/' + this.model.id;
-            let promisses = vectorWidgets.map(widget => {
-                let figmaImage = widget.props.figmaImage
-                this.logger.log(-1, 'downloadFigmaImages', 'enter', figmaImage)
-                return new Promise ((resolve, reject) => {
-                    var myRequest = new Request(figmaImage);
-                    fetch(myRequest).then(response => response.blob()).then(blob => {
-                        done++
-                        this.setProgress(((done / total) * 80) + 20)
-
-                        var formData = new FormData()
-                        formData.append(widget.name +'.png', blob, widget.name +'.png')
-                        imageService.upload(url, formData).then(uploadResponse => {
-                            uploadResponse = JSON.parse(uploadResponse)
-                            let upload = uploadResponse.uploads[0]
-                            if (upload) {
-                                widget.style.backgroundImage = {
-                                    name: upload.name,
-                                    url: upload.url,
-                                    w: upload.width,
-                                    h: upload.height
-                                };
-                            }
-
-                            done++
-                            this.setProgress(((done / total) * 80) + 20)
-
-                            resolve(widget)
-                        }, err => {
-                            this.logger.error('downloadFigmaImages', 'Could not upload image')
-                            reject(err)
-                        })
-                    }, err => {
-                        this.logger.error('downloadFigmaImages', 'Could get blob')
-                        reject(err)
-                    })
-                })
-            })
-            let images = await Promise.all(promisses)
-            return images
         },
 
         async uploadImagesAndCreateScreens () {
@@ -528,9 +238,6 @@ export default {
             e.preventDefault()
             e.dataTransfer.dropEffect = 'copy'
             this.hasDrop = true
-            if (this.tab === 'figma') {
-                this.tab = 'images'
-            }
         },
 
         onDragLeave (e) {
@@ -664,14 +371,6 @@ export default {
     },
     mounted () {
         this.logger = new Logger("ImportDialog");
-        this.figmaAcccessKey = localStorage.getItem('quxFigmaAccessKey')
-        this.figmaUrl = localStorage.getItem('quxFigmaUrl')
-        this.swaggerURL = localStorage.getItem('quxSwaggerURL')
-        if (location.href.indexOf('localhost') > 0) {
-            //this.hasSwagger = true
-            //this.tab = 'swagger'
-        }
-
     }
 }
 </script>

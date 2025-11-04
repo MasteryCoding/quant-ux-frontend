@@ -19,7 +19,6 @@ matcRoutes.push({path:'apps/my-apps.html', component: () => import(/* webpackChu
 matcRoutes.push({path:'apps/logged_in.html', component: () => import(/* webpackChunkName: "apps" */ 'views/apps/Studio.vue'),  meta: {hideHeader: true}})
 matcRoutes.push({path:'apps/:id.html', component: () => import(/* webpackChunkName: "apps" */ 'views/apps/Studio.vue'), meta: {hideHeader: true}})
 matcRoutes.push({path:'apps/:id/:tab.html', component: () => import(/* webpackChunkName: "apps" */ 'views/apps/Studio.vue'), meta: {hideHeader: true}})
-matcRoutes.push({path:'apps/:id/replay/:session.html', component: () => import(/* webpackChunkName: "apps" */ 'views/apps/Studio.vue'), meta: {hideHeader: true}})
 matcRoutes.push({path:'apps/create-app.html', component: () => import(/* webpackChunkName: "apps" */ 'views/apps/Create.vue'), meta: {hideHeader: true}})
 matcRoutes.push({path:'apps/tryout.html', component: () => import(/* webpackChunkName: "apps" */ 'views/apps/Create.vue'), meta: {hideHeader:true}})
 
@@ -80,18 +79,6 @@ export default new VueRouter({
       component: () => import(/* webpackChunkName: "design" */ 'views/apps/Share.vue')
     },
     {
-      path: '/apps/:id/analyze/workspace.html',
-      name: 'AnalyticCanvasPage',
-      meta: {viewMode: 'Heatmap'},
-      component: () => import(/* webpackChunkName: "design" */ 'views/apps/Design.vue')
-    },
-    {
-      path: '/examples/:id/analyze/workspace.html',
-      name: 'ExampleAnalyticCanvasPage',
-      meta: {isPublic:true, viewMode: 'Heatmap'},
-      component: () => import(/* webpackChunkName: "design" */ 'views/apps/Design.vue')
-    },
-    {
       path: '/',
       name: '',
       children: matcRoutes,
@@ -136,10 +123,6 @@ export default new VueRouter({
     {
       path: '/test/SVG.html',
       component: () => import(/* webpackChunkName: "unit" */ './unit/SVGEditorTest.vue')
-    },
-    {
-      path: '/test/Figma.html',
-      component: () => import(/* webpackChunkName: "unit" */ './unit/FigmaTest.vue')
     },
     {
       path: '/test/Import.html',

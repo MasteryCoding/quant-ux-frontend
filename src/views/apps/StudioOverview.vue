@@ -23,11 +23,7 @@
                 :userID="user.id" 
                 :qteam="team"/>
                 
-              <a :class="['MatcButton MatcButtonXS MatcButton MatcButtonSecondary MatcButtonSecondaryBlue MatcRoundButton', { 'MatcButtonPassive': tab == 'X' }]" v-if="tab === 'analyze'"
-                  :href="`#/${urlPrefix}/${appID}/analyze/workspace.html`" id="overviewHeaderRunTest">
-                  {{$t('app.analyze') }}
-              </a>
-              <a :class="['MatcButton MatcButtonXS MatcButtonSecondary MatcButtonSecondaryBlue MatcRoundButton', { 'MatcButtonPassive': tab == 'X' }]" v-if="tab !== 'analyze'"
+              <a class="MatcButton MatcButtonXS MatcButtonSecondary MatcButtonSecondaryBlue MatcRoundButton"
                 :href="`#/${urlPrefix}/${appID}/design/start.html`" id="overviewHeaderRunTest">
                 {{$t('app.edit') }}
               </a>
@@ -47,14 +43,6 @@
               <a :href="`#/${urlPrefix}/${appID}/design.html`" :class="{'MatcTabActive': tab === 'design'}">
                 <QIcon icon="Overview" />
                 {{ $t('app.overview.design') }}
-              </a>
-              <a :href="`#/${urlPrefix}/${appID}/test.html`" :class="{'MatcTabActive': tab == 'test' || tab === 'video'}" >
-                <QIcon icon="Tests" />
-                {{ $t('app.overview.test') }}              
-              </a>
-              <a :href="`#/${urlPrefix}/${appID}/analyze.html`" :class="{'MatcTabActive': tab == 'analyze'}">
-                <QIcon icon="Results" />
-                {{ $t('app.overview.dash') }}
               </a>
               <!-- <a :href="`#/${urlPrefix}/${appID}/comments.html`" :class="{'MatcTabActive': tab == 'comments'}">{{ $t('app.overview.comments') }}</a> -->
             </div>
@@ -85,24 +73,6 @@
             </div>
 
 
-          </div>
-          <div v-if="tab == 'test'">
-            <TestTab :loading="loading" :app="app" :test="testSettings" :hash="hash" :annotation="sessionAnnotations"
-              :events="events" @reloadEvents="reloadEvents" v-if="restLoaded" @change="onTestChange" />
-          </div>
-          <div v-if="tab == 'analyze'">
-            <AnalyticsTab :loading="loading" :app="app" :hash="hash" :test="testSettings" :annotation="sessionAnnotations"
-              :events="events" v-if="restLoaded" @change="onTestChange" />
-          </div>
-
-          <div v-if="tab == 'heat'">
-            <HeatTab :loading="loading" :app="app" :test="testSettings" :annotation="sessionAnnotations" :events="events"
-              v-if="restLoaded" />
-          </div>
-
-          <div v-if="tab == 'video'">
-            <VideoTab :loading="loading" :app="app" :test="testSettings" :annotation="sessionAnnotations" :events="events"
-              v-if="restLoaded" @change="onAnnotationChange" />
           </div>
 
           <div v-if="tab == 'settings'">
@@ -145,10 +115,6 @@ import * as UIUtil from '../../util/UIUtil'
 import ScreenList from "page/ScreenList";
 import AutoTextArea from 'page/AutoTextArea'
 import QIcon from "page/QIcon";
-import TestTab from "views/apps/test/TestTab";
-import AnalyticsTab from "views/apps/analytics/AnalyticsTab";
-import HeatTab from "views/apps/analytics/HeatTab";
-import VideoTab from "views/apps/test/VideoTab";
 import CommentsTab from 'views/apps/CommentsTab'
 import SettingsTab from "views/apps/SettingsTab";
 import SplitContainer from "page/SplitContainer";
@@ -192,12 +158,8 @@ export default {
   },
   components: {
     ScreenList: ScreenList,
-    TestTab: TestTab,
-    AnalyticsTab: AnalyticsTab,
-    VideoTab: VideoTab,
     SettingsTab: SettingsTab,
     Team: Team,
-    HeatTab: HeatTab,
     StudioColorDropDown: StudioColorDropDown,
     QIcon: QIcon,
     QIconDropDown: QIconDropDown,
