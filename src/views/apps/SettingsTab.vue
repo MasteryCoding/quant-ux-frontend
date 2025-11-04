@@ -71,7 +71,6 @@
 <script>
 import Logger from "common/Logger";
 import DojoWidget from "dojo/DojoWidget";
-import Team from "page/Team";
 import Services from "services/Services";
 import on from "dojo/on";
 import touch from "dojo/touch";
@@ -91,7 +90,6 @@ export default {
     };
   },
   components: {
-    Team: Team
   },
   computed: {
     base() {
@@ -138,7 +136,6 @@ export default {
       location.href = "#/apps/my-apps.html";
     },
     async resetShare() {
-      await Services.getModelService().resetTeam(this.app.id);
       /**
        * Could be nicer by reloading invitaions and passing to parent. This is lazy
        */

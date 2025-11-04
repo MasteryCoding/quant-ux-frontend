@@ -1,11 +1,10 @@
 <template>
   <div class="Matc">
-    <LoginPage v-if="isGuest" :user="user" @login="onLogin"/>
-    <div class="MatcContainer" v-else>
+    <div class="MatcContainer">
       <QHeader :user="user" @login="onLogin" @logout="onLogout" v-if="hasHeader"/>
-      <router-view  @logout="onLogout"></router-view>
+      <router-view :user="user" @login="onLogin" @logout="onLogout" @reload="reload"/>
     </div>
-    <ErrorDialog ref="errorDialog"></ErrorDialog>
+    <ErrorDialog ref="errorDialog"/>
   </div>
 </template>
 <style lang="scss">
@@ -16,7 +15,6 @@
   @import "../style/bulma.sass"
 </style>
 <script>
-import LoginPage from 'views/LoginPage'
 import Header from 'views/Header'
 import Services from 'services/Services'
 import Logger from 'common/Logger'
@@ -46,8 +44,7 @@ export default {
   },
   components: {
     'QHeader': Header,
-    'ErrorDialog': ErrorDialog,
-    'LoginPage': LoginPage
+    'ErrorDialog': ErrorDialog
   },
   computed: {
     isGuest () {

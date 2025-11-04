@@ -99,11 +99,10 @@
 
 					
 									
-						<div class="MatcToolbarNotificationSection MatcToolbarSection" data-dojo-attach-point="notificationSection">
-							<div class="MatcToolbarSection">
-								<CollabUser :users="collabUsers" @select="onCollabUserClicked" />
-							</div>		
-										
+					<div class="MatcToolbarNotificationSection MatcToolbarSection" data-dojo-attach-point="notificationSection">
+						<div class="MatcToolbarSection">
+						</div>		
+									
 							<div class="MatcToolbarArrowDropDown" data-dojo-attach-point="simulatorButton"  v-show="hasScreens">			
 								<div class="MatcToolbarItem MatcToolbarPrimaryItem" @click="startSimilator">																
 									<QIcon icon="Play" />												
@@ -163,7 +162,6 @@ import _Dialogs from 'canvas/toolbar/mixins/_Dialogs'
 import _Show from 'canvas/toolbar/mixins/_Show'
 import ViewConfig from 'canvas/toolbar/components/ViewConfig'
 import EditModeButton from "canvas/toolbar/components/EditModeButton"
-import CollabUser from "canvas/toolbar/components/CollabUser"
 import ModelUtil from '../../core/ModelUtil';
 import * as LayoutContainerUtil from '../../core/LayoutContainerUtil'
 
@@ -210,7 +208,6 @@ export default {
 		'ViewConfig': ViewConfig,
 		//'HelpButton': HelpButton,
 		'EditModeButton': EditModeButton,
-		'CollabUser': CollabUser,
 		'CreateVectorButton': CreateVectorButton,
 		'CreateLogicButton': CreateLogicButton,
 		'CreateBasicButton': CreateBasicButton,
@@ -331,19 +328,6 @@ export default {
 			this.collabUsers.push(user)
 		},
 
-		addCollabUser (user) {
-			this.logger.log(1,"addCollabUser", "entry ", user);
-			const found = this.collabUsers.find(u => u.id === user.id)
-			if (!found) {
-				this.collabUsers.push(user)
-			}
-		},
-
-		removeCollabUser (user) {
-			this.logger.log(1,"removeCollabUser", "entry ", user);
-			this.collabUsers = this.collabUsers.filter(u => u.id !== user.id)
-		},
-
 		getSettings (){
 			if (this.canvas){
 				return this.canvas.getSettings();
@@ -382,13 +366,6 @@ export default {
 				this.canvas.setViewMode(mode)
 			}
 			this.updatePropertiesView()
-		},
-
-		onCollabUserClicked (user) {
-			this.logger.log(-1,"onCollabUserClicked", "entry > ", user);
-			if (this.canvas && this.user.id !== user.id) {
-				this.canvas.moveToCollabUser(user)
-			}
 		},
 
 		onFadeOut (){

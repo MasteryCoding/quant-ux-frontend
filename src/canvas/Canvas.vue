@@ -76,7 +76,6 @@ import Layer from 'canvas/Layer'
 import DataView from 'canvas/DataView'
 import ScreenRuler from 'canvas/ScreenRuler'
 import CustomHandler from 'canvas/CustomHandler'
-import Collab from 'canvas/Collab'
 import SVG from 'canvas/SVG'
 import ContextMenu from './ContextMenu'
 
@@ -94,7 +93,7 @@ export default {
 	props:['viewport'],
 	mixins:[DojoWidget, _DragNDrop, Util, Render, Lines, DnD, Add, Select, Distribute, Tools,
 			Zoom, InlineEdit, Scroll, Upload, Comment, Layer, CustomHandler, ScreenRuler, DataView,
-			KeyBoard, Resize, Replicate, Prototyping, Collab, SVG, GridResize],
+			KeyBoard, Resize, Replicate, Prototyping, SVG, GridResize],
     data: function () {
         return {
 			mode: "edit",
