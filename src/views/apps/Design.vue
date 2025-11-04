@@ -27,7 +27,6 @@ import lang from "dojo/_base/lang";
 import on from "dojo/on";
 import Services from "services/Services";
 import Logger from "common/Logger";
-import CollabSession from '../../canvas/controller/CollabSession'
 
 export default {
   name: "Design",
@@ -235,12 +234,6 @@ export default {
        * Init layer list
        */
       canvas.initLayer();
-
-      if (!this.pub && this.user.role !== 'guest') {
-        this.collabSession = new CollabSession(this.user)
-        this.collabSession.initWebsocket(model, canvas, controller, toolbar)
-        window.onbeforeunload = () => {this.collabSession.sendBye()}
-      }
     },
 
 
@@ -253,10 +246,6 @@ export default {
 
   },
   beforeDestroy () {
-    if (this.collabSession) {
-      this.collabSession.sendBye()
-      this.collabSession.close()
-    }
   },
   async mounted() {
     this.logger = new Logger("Design");

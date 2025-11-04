@@ -21,16 +21,42 @@ class UserService extends AbstractService{
         }
     }
 
-    async signup (data) {
-        return this._post('/rest/user', data)
-    }
+    /**
+     * Exchange authorization cookie for Quant-UX JWT token
+     */
+    async exchangeToken () {
+        try {
+            this.logger.info('exchangeToken()', 'Attempting token exchange')
+            const authCookie = Cookies.get('authorization')
+            
+            if (!authCookie) {
+                this.logger.info('exchangeToken()', 'No authorization cookie found')
+                return null
+            }
 
-    async login (data) {
-        let user = await this._post('rest/login/', data)
-        if (!user.errors) {
-            this.setUser(user)
+            const response = await fetch('/rest/user/token-exchange', {
+                method: 'POST',
+                headers: {
+                    'Authorization': authCookie,
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            })
+
+            if (response.ok) {
+                const user = await response.json()
+                if (user && user.token) {
+                    this.logger.info('exchangeToken()', 'Token exchange successful')
+                    this.setUser(user)
+                    return user
+                }
+            } else {
+                this.logger.error('exchangeToken()', 'Token exchange failed', response.status)
+            }
+        } catch (error) {
+            this.logger.error('exchangeToken()', 'Error during token exchange', error)
         }
-        return user;
+        return null
     }
 
     save (userID, data) {
@@ -41,53 +67,45 @@ class UserService extends AbstractService{
         localStorage.removeItem('quxUser');
         Cookies.remove('quxUserLoggedIn')
         Cookies.remove('quxUserLoggedIn', { path: '/' })
-        Cookies.remove('quxUserLoggedIn', { path: '/' , domain: 'quant-ux.com'})
-        return this._delete('rest/login/')
+        Cookies.remove('authorization')
+        Cookies.remove('authorization', { path: '/' })
+        this.user = this.GUEST
+        location.href = "#/"
     }
 
-    reset (email) {
-        return this._post('/rest/user/password/request', {email: email})
-    }
-
-    reset2 (email, password, token) {
-        let data = {
-            email: email,
-            password: password,
-            key: token
-        }
-        return this._post('/rest/user/password/set', data)
-    }
-
-    retire () {
-        this.logger.info('retire()', 'enter > Oh oh')
-        return this._get('/rest/retire')
-    }
-
-    load () {
+    async load () {
         if (!this.user) {
-            this.logger.info('getUser()', 'load')
-            let s = Cookies.get('quxUserLoggedIn')
-            if (s == undefined || s === null || s === '') {
-                this.logger.info('getUser()', 'from localstorage')
-                s = localStorage.getItem('quxUser')
-            }
+            this.logger.info('load()', 'Loading user')
+            
+            // First, try to load from localStorage
+            let s = localStorage.getItem('quxUser')
             if (s) {
                 try {
                     const user = JSON.parse(s)
                     this.setTTL(user)
                     if (this.isValidUser(user)) {
+                        this.logger.info('load()', 'Valid user from localStorage')
                         this.user = user
                         this.setToken(this.getToken())
+                        return this.user
                     } else {
-                        this.user = this.GUEST
+                        this.logger.info('load()', 'User token expired, attempting refresh')
                     }
                 } catch (error) {
-                    this.logger.error('getUser', 'could not parse', s)
-                    this.user = this.GUEST
+                    this.logger.error('load', 'Could not parse stored user', s)
                 }
-            } else {
-                this.user = this.GUEST
             }
+
+            // If no valid user, try token exchange
+            const user = await this.exchangeToken()
+            if (user) {
+                this.user = user
+                return this.user
+            }
+
+            // Default to guest
+            this.logger.info('load()', 'No valid authentication, using guest')
+            this.user = this.GUEST
         }
         return this.user
     }
@@ -115,10 +133,22 @@ class UserService extends AbstractService{
     getToken () {
         /**
          * We might have an issue here on first loads!
-         * Make sure we chheck the local storage.
+         * Make sure we check the local storage.
          */
         if (!this.user) {
-            this.load()
+            // Note: load() is now async, but we need to maintain backwards compatibility
+            // Caller should ensure load() is called before getToken()
+            const s = localStorage.getItem('quxUser')
+            if (s) {
+                try {
+                    const user = JSON.parse(s)
+                    if (this.isValidUser(user)) {
+                        this.user = user
+                    }
+                } catch (error) {
+                    this.logger.error('getToken', 'could not parse', s)
+                }
+            }
         }
 
         if (this.user && this.user.token) {
@@ -143,7 +173,6 @@ class UserService extends AbstractService{
             } else {
                 this.logger.error('isValidUser', 'Error > Token has timed out')
                 this.logout()
-                location.href= "#/"
             }
         }
         return false
@@ -163,7 +192,7 @@ class UserService extends AbstractService{
                     location.href = `#/logout.html`
                 }, waitTime)
                 this.logger.log(-1, 'setTTL', 'User valid until', new Date(u.exp))
-                this.logger.log(-1, 'setTTL', 'Auto loggout  in ' + (waitTime / 1000) + ' sec')
+                this.logger.log(-1, 'setTTL', 'Auto logout in ' + (waitTime / 1000) + ' sec')
             } else {
                 this.logger.log(-1, 'setTTL', 'exit > NO token')
             }
@@ -188,11 +217,10 @@ class UserService extends AbstractService{
         this.setTTL(u)
         this.user = u
         localStorage.setItem('quxUser', JSON.stringify(u));
-        Cookies.set('quxUserLoggedIn', JSON.stringify(u), { domain: 'quant-ux.com', expires: 7, secure: true, path:'/'}) 
     }
 
-    setLanguage (langauge) {
-        this.language = langauge
+    setLanguage (language) {
+        this.language = language
         localStorage.setItem('quxLanguage', this.language);
     }
 

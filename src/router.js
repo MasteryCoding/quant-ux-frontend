@@ -6,9 +6,7 @@ Vue.use(VueRouter)
 
 let matcRoutes = []
 
-matcRoutes.push({path:'my-account.html', component: () => import(/* webpackChunkName: "about" */ 'views/user/Account.vue'), meta: {hasHeader: true}})
 matcRoutes.push({path:'404.html', component: () => import(/* webpackChunkName: "about" */ 'views/404.vue'), meta: {hasHeader: true}})
-matcRoutes.push({path:'logout.html', component: () => import(/* webpackChunkName: "about" */ 'views/LogoutPage.vue'), meta: {hasHeader: true}})
 matcRoutes.push({path:'help.html', component: () => import(/* webpackChunkName: "about" */ 'views/Help.vue'), meta: {hasHeader: true}})
 matcRoutes.push({path:'help/:topic.html', component: () => import(/* webpackChunkName: "about" */ 'views/Help.vue'), meta: {hasHeader: true}})
 matcRoutes.push({path:'help/:topic/:subtopic.html', component: () => import(/* webpackChunkName: "about" */ 'views/Help.vue'), meta: {hasHeader: true}})

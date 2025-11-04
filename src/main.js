@@ -7,6 +7,7 @@ import Services from 'services/Services';
 
 async function start() {
   await Services.initConfig();
+  await Services.getUserService().load();
 
   Vue.use(VueI18n);
   Vue.config.productionTip = false;

@@ -5,7 +5,6 @@ import CommentService from './CommentService'
 import SymbolService from './SymbolService'
 import HelpService from './HelpService'
 import ImageService from './ImageService'
-import WebSocketService from './WebSocketService'
 import CommandService from './CommandService'
 import NotificationService from './NotificationService'
 import AIService from './AIService'
@@ -17,8 +16,7 @@ class Services {
     constructor () {
         this.config = {
             'default': true,
-            'auth': 'qux',
-            'websocket': 'wss://ws.quant-ux.com'
+            'auth': 'qux'
         }
     }
 
@@ -68,14 +66,6 @@ class Services {
         NotificationService.setToken(this.getUserService().getToken())
         NotificationService.setUser(this.getUserService().getUser())
         return NotificationService
-    }
-
-    getWebSocketService (modelId, token, user) {
-        if (this.config.websocket) {
-            let ws = new WebSocketService(this.config.websocket, modelId, token, user)
-            return ws
-        }
-        return null
     }
 
     getAIService () {

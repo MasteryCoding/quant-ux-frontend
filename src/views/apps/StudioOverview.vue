@@ -17,12 +17,6 @@
  
 
             <div class="MatcFlexColumn">
-              <Team
-                v-if="app.id && user.id && appLoaded && !isPublic" 
-                :appID="app.id" 
-                :userID="user.id" 
-                :qteam="team"/>
-                
               <a class="MatcButton MatcButtonXS MatcButtonSecondary MatcButtonSecondaryBlue MatcRoundButton"
                 :href="`#/${urlPrefix}/${appID}/design/start.html`" id="overviewHeaderRunTest">
                 {{$t('app.edit') }}
@@ -122,7 +116,6 @@ import QIconDropDown from 'page/QIconDropDown'
 import StudioColorDropDown from './StudioColorDropDown'
 import StudioDetails from './StudioDetails'
 
-import Team from "page/Team";
 import Share from "page/Share";
 import Services from "services/Services";
 
@@ -133,7 +126,6 @@ export default {
   data: function () {
     return {
       loading: true,
-      team: [],
       tab: "design",
       appID: "",
       app: {
@@ -159,7 +151,6 @@ export default {
   components: {
     ScreenList: ScreenList,
     SettingsTab: SettingsTab,
-    Team: Team,
     StudioColorDropDown: StudioColorDropDown,
     QIcon: QIcon,
     QIconDropDown: QIconDropDown,
@@ -297,17 +288,11 @@ export default {
     loadRest() {
       let id = this.$route.params.id;
       Promise.all([
-        this.modelService.findTest(id),
-        this.modelService.findSessionAnnotations(id),
-        this.modelService.findInvitation(id),
-        this.modelService.findTeam(id)
+        this.modelService.findInvitation(id)
       ])
         .then(values => {
-          this.testSettings = values[0];
-          this.sessionAnnotations = values[1];
           this.restLoaded = true;
-          this.invitations = values[2];
-          this.team = values[3]
+          this.invitations = values[0];
           const temp = {};
           for (let key in this.invitations) {
             temp[this.invitations[key]] = key;
@@ -478,7 +463,6 @@ export default {
     },
 
     async changeHash (d) {
-      await Services.getModelService().resetTeam(this.app.id);
       location.reload();
       d.close()
       //this.$emit("delete", app)
