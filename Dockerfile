@@ -1,15 +1,12 @@
 ARG NODE_VERSION=16
 ARG ALPINE_VERSION=
 
-
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS production-dependencies
 USER node
 WORKDIR /home/node
 
 COPY --chown=node:node [".", "./"]
 RUN npm clean-install --omit=dev
-
-
 
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS builder
 USER node
@@ -20,8 +17,6 @@ COPY --chown=node:node --from=production-dependencies ["/home/node/node_modules"
 
 RUN npm install --include=dev
 RUN npm run build
-
-
 
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS runtime-production
 
@@ -34,11 +29,6 @@ COPY --chown=node:node ["server/", "./server"]
 COPY --chown=node:node ["public/", "./public"]
 
 CMD [ "node", "server/start.js" ]
-
-
-
-
-
 
 
 # placed last since if the person targeting runtime-production doesn't have BuildKit installed, it'll build everything until the targeted stage
