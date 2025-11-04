@@ -1,5 +1,6 @@
 ARG NODE_VERSION=16
 ARG ALPINE_VERSION=
+ARG BUILD_DATE
 
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS production-dependencies
 USER node
@@ -9,6 +10,13 @@ COPY --chown=node:node [".", "./"]
 RUN npm clean-install --omit=dev
 
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS builder
+
+# Install build dependencies for native modules (python3, make, g++)
+# BUILD_DATE arg forces cache invalidation: ${BUILD_DATE}
+USER root
+RUN apk add --no-cache python3 make g++ && \
+    ln -sf python3 /usr/bin/python
+
 USER node
 WORKDIR /home/node
 

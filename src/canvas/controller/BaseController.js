@@ -539,41 +539,15 @@ export default class BaseController extends Core {
 	 ***************************************************************************************/
 
 	setModelChangeListener (callback) {
-		this.collabChangeListener = callback
+		// No-op: collaboration disabled
 	}
 
 	collabBroadcastChanges (changes) {
-		this.logger.log(1, "collabBroadcastChanges", "enter " , changes);
-
-		if (this.collabService && this.collabChangeListener) {
-			let event = this.collabService.createEvent(changes)
-			this.collabChangeListener(event)
-		}
-
+		// No-op: collaboration disabled
 	}
 
 	collabRecieveChanges (user, event) {
-		this.logger.log(-1, "collabRecieveChanges", "enter " , event);
-
-		/**
-		 * Called from CollabSession with other users event.
-		 * 1) Apply changes and set the model as the old model to 
-		 * avoid recursve calls or double saves
-		 * 2) Render
-		 * 
-		 * we do not commit model changes, as we expect
-		 * they other to have done this
-		 */
-		this.model = this.collabService.applyEvent(this.model, event)
-		this.setOldModel(this.model)
-		
-		const inheritedModel = this.getInheritedModel(this.model)
-		requestAnimationFrame(() => {
-			this._canvas.render(inheritedModel, false);
-			//this._canvas.renderAllCollabMousePositions()
-		})
-	
-		this.logger.log(-1, "collabRecieveChanges", "exit " , this.model.lastUUID);
+		// No-op: collaboration disabled
 	}
 
 
