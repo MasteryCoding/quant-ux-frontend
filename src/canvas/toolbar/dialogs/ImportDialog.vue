@@ -81,7 +81,6 @@ import DojoWidget from 'dojo/DojoWidget'
 import Logger from 'common/Logger'
 import Util from 'core/Util'
 import Services from 'services/Services'
-import RadioBoxList from 'common/RadioBoxList'
 
 import ZipSevice from 'services/ZipService'
 
@@ -106,7 +105,6 @@ export default {
         }
     },
     components: {
-        'RadioBoxList': RadioBoxList
     },
     computed: {
         previewWidth () {

@@ -29,77 +29,19 @@
 
 <script>
 
-import WebSocketService from 'services/WebSocketService'
-import Services from 'services/Services'
-import { v4 as uuidv4 } from 'uuid';
-
-
 export default {
   name: "WebSocketTest",
   mixins: [],
   data: function() {
     return {
-      clients: [
-        {
-          id: 1,
-          app: '612d1379295894e6d2a8672e',
-          send: '',
-          messages: [],
-          error: false
-        },
-        {
-          id: 2,
-          app: '612d1379295894e6d2a8672e',
-          send: '',
-          messages: [],
-          error: false
-        },
-        {
-          id: 3,
-          app: '610af1d1295894e6d2a336ce',
-          send: '',
-          messages: [],
-          error: false
-        },
-        {
-          id: 4,
-          app: '610af1d1295894e6d2a336ce',
-          send: '',
-          messages: [],
-          error: false
-        }
-      ]
     }
   },
   components: {
 
   },
   methods: {
-    send (client){
-      console.debug('send()', client.message)
-      client.service.send({
-        type: 'chat',
-        id: uuidv4(),
-        message: client.message
-      });
-    }
   },
   mounted() {
-
-    this.clients.forEach(client => {
-      // ws://localhost:8086
-      client.service = new WebSocketService('ws://localhost:8086', client.app, Services.getUserService().getToken())
-      client.service.onMessage(message => {
-        client.messages.push(message)
-      })
-      client.service.onError(() => {
-        client.error =  true
-      })
-      client.service.init()
-    })
-
-
-
   }
 };
 </script>

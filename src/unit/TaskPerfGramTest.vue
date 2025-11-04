@@ -43,27 +43,10 @@ export default {
     
   },
   computed: {
-    df() {
-      let events = this.filterEvents(funnelEvents, []);
-      var actionEvents = this.getActionEvents(new DataFrame(events));
-      events = actionEvents.as_array();
-      var df = new DataFrame(events);
-      df.sortBy("time");
-      return df;
-    }
   },
   methods: {
   },
   mounted() {
-      const task = funnelTestSettings.tasks[0]
-
-        const gram = this.$new(TaskPerfGram, {
-          model: funnelApp,
-          dialog: null,
-          mode: ''
-        })
-        gram.setValue(this.df, task, [], funnelTestSettings.tasks);
-        gram.placeAt(this.$refs.cntr);
   }
 };
 </script>
