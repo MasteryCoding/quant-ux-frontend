@@ -1,9 +1,9 @@
 <template>
   <div class="MatcLight">
-    <h1>TabelConf Test</h1>
+    <h1>TaskPerfGram Test - DISABLED (Analytics Removed)</h1>
 
     <div class="dialog MatcDashTaskPerfGramDialog">
-      <div ref="cntr"/>
+      <p>This test has been disabled because analytics features were removed.</p>
     </div>
 
 
@@ -31,17 +31,9 @@
 
 <script>
 
-import funnelApp from './data/funnelApp.json'
-import funnelEvents from './data/funnelEvents.json'
-import funnelTestSettings from './data/funnelTestSettings.json'
-import DataFrame from "common/DataFrame";
-
-import TaskPerfGram from '../../src/views/apps/analytics/TaskPerfGram'
-import DojoWidget from "dojo/DojoWidget";
-import TestSettings from "views/apps/test/TestSettings";
 export default {
   name: "TaskPerfGramTest",
-  mixins: [TestSettings, DojoWidget],
+  mixins: [],
   data: function() {
     return {
         model: null

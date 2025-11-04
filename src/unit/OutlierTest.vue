@@ -1,8 +1,8 @@
 <template>
      <div class="MatcLight">
-      <h1>Outlier Test</h1>
+      <h1>Outlier Test - DISABLED (Analytics Removed)</h1>
       <div class="MatcPadding">
-        <ScatterSection></ScatterSection>
+        <p>This test has been disabled because analytics features were removed.</p>
       </div>
  
     </div>
@@ -14,20 +14,16 @@
   
   <script>
   
-  import layerapp from './data/outlier1.json'
-  import ScatterSection from '../views/apps/analytics/DistributionSection.vue'
-  
   export default {
     name: "OutlierTest",
     mixins: [],
     data: function() {
       return {
-        app: layerapp,
+        app: {},
         groups: {}
       };
     },
     components: {
-        ScatterSection
     },
     methods: {
   

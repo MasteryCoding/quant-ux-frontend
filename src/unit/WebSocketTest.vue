@@ -1,12 +1,8 @@
 <template>
   <div class="MatcLight">
-    <h1>WebSocket Test</h1>
-    <div class="MatcTReeCntr" v-for="client in clients" :key="client.id">
-      <input v-model="client.message" v-if="!client.error"/>
-      <span class="MatcButton" @click="send(client)"> Send </span>
-      <div v-for="(m,i) in client.messages" :key="i">
-        {{m}}
-      </div>
+    <h1>WebSocket Test - DISABLED (WebSocket Removed)</h1>
+    <div class="MatcTReeCntr">
+      <p>This test has been disabled because WebSocket collaboration features were removed.</p>
     </div>
 
 

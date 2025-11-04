@@ -1,9 +1,9 @@
 <template>
   <div class="MatcLight">
-    <h1>TabelConf Test</h1>
+    <h1>TaskCreateDialog Test - DISABLED (Analytics Removed)</h1>
 
     <div class="dialog">
-      <TaskCreateDialog :model="mobile" />
+      <p>This test has been disabled because analytics features were removed.</p>
     </div>
 
 
@@ -30,23 +30,15 @@
 
 <script>
 
-import desktop from './data/tableapp.json'
-import mobile from './data/taskCreateMobile.json'
-
-import TaskCreateDialog from '../../src/views/apps/analytics/TaskCreateDialog'
-
 export default {
-  name: "TaskCreatDialogTest",
+  name: "TaskCreateDialogTest",
   mixins: [],
   data: function() {
     return {
-        desktop: desktop,
-        mobile: mobile,
         model: null
     };
   },
   components: {
-    'TaskCreateDialog': TaskCreateDialog
   },
   computed: {
   },
