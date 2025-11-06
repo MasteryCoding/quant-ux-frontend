@@ -20,6 +20,7 @@ export default class CollabService {
       this.events = []
     }
 
+    // eslint-disable-next-line no-unused-vars
     createEvent (changes) {
       // No-op: collaboration disabled
       return {
@@ -30,11 +31,13 @@ export default class CollabService {
       }
     }
 
+    // eslint-disable-next-line no-unused-vars
     applyEvent (model, event) {
       // No-op: collaboration disabled
       return model
     }
 
+    // eslint-disable-next-line no-unused-vars
     pushEvent(event) {
       // No-op: collaboration disabled
     }

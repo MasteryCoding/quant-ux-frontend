@@ -538,14 +538,17 @@ export default class BaseController extends Core {
 	 *  Collab stuff
 	 ***************************************************************************************/
 
+	// eslint-disable-next-line no-unused-vars
 	setModelChangeListener (callback) {
 		// No-op: collaboration disabled
 	}
 
+	// eslint-disable-next-line no-unused-vars
 	collabBroadcastChanges (changes) {
 		// No-op: collaboration disabled
 	}
 
+	// eslint-disable-next-line no-unused-vars
 	collabRecieveChanges (user, event) {
 		// No-op: collaboration disabled
 	}
