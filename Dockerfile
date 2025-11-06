@@ -6,8 +6,15 @@ FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS production-dependencies
 USER node
 WORKDIR /home/node
 
-COPY --chown=node:node [".", "./"]
+COPY --chown=node:node ["package*.json", "./"]
 RUN npm clean-install --omit=dev
+
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS all-dependencies
+USER node
+WORKDIR /home/node
+
+COPY --chown=node:node ["package*.json", "./"]
+RUN npm clean-install
 
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS builder
 
@@ -38,6 +45,7 @@ FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS runtime-development
 USER node
 WORKDIR /home/node
 
+COPY --chown=node:node --from=all-dependencies ["/home/node/node_modules", "node_modules/"]
 COPY --chown=node:node [".", "./"]
 COPY --chown=node:node --from=builder ["/home/node/dist", "dist/"]
 
