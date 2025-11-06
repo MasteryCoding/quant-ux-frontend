@@ -11,20 +11,12 @@ RUN npm clean-install --omit=dev
 
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS builder
 
-# Install build dependencies for native modules (python3, make, g++)
-# BUILD_DATE arg forces cache invalidation: ${BUILD_DATE}
-USER root
-RUN apk add --no-cache python3 make g++ && \
-    ln -sf python3 /usr/bin/python
-
 USER node
 WORKDIR /home/node
 
-COPY --chown=node:node [".", "./"]
-COPY --chown=node:node --from=production-dependencies ["/home/node/node_modules", "node_modules/"]
-
-RUN npm install --include=dev
-RUN npm run build
+# Copy pre-built dist folder from context (built in CI)
+# This avoids rebuilding for each architecture under QEMU emulation
+COPY --chown=node:node ["dist/", "dist/"]
 
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS runtime-production
 
@@ -46,6 +38,7 @@ FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS runtime-development
 USER node
 WORKDIR /home/node
 
-COPY --chown=node:node --from=builder ["/home/node", "./"]
+COPY --chown=node:node [".", "./"]
+COPY --chown=node:node --from=builder ["/home/node/dist", "dist/"]
 
 CMD [ "npm", "run", "serve", "--", "--port", "8082" ]
