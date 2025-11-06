@@ -6,7 +6,6 @@ import SymbolService from './SymbolService'
 import HelpService from './HelpService'
 import ImageService from './ImageService'
 import CommandService from './CommandService'
-import NotificationService from './NotificationService'
 import AIService from './AIService'
 import AISimService from './AISimService'
 import UploadService from './UploadService'
@@ -60,12 +59,6 @@ class Services {
     getUploadService() {
         UploadService.setToken(this.getUserService().getToken())
         return UploadService
-    }
-
-    getNotificationService() {
-        NotificationService.setToken(this.getUserService().getToken())
-        NotificationService.setUser(this.getUserService().getUser())
-        return NotificationService
     }
 
     getAIService () {

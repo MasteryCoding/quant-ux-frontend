@@ -234,14 +234,6 @@ class UserService extends AbstractService{
         return this.language
     }
 
-    contact (name, email, message) {
-        return this._post("/rest/contact", {
-            name: name,
-            email: email,
-            message: message
-        })
-    }
-
     deleteImage (user) {
         return this._delete( "/rest/user/" + user.id + "/images/" + user.image);
     }
