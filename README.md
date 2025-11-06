@@ -94,6 +94,7 @@ services:
       - QUX_KEYCLOAK_CLIENT=
       - QUX_KEYCLOAK_URL=
       - QUX_WS_URL=ws://127.0.0.1:8086        # change to where the websocket server is deployed for external access
+      - VUE_APP_QUX_MC_CLASSROOM_URL=https://classroom.masterycoding.com  # MasteryCoding Classroom URL (for authentication redirects)
     links:
       - mongo
       - qux-be
@@ -226,7 +227,11 @@ export QUX_PROXY_URL=https://your.quant-ux.server.com // backend host
 
 export QUX_WS_URL= wss.quant-ux.server.com // web socket server
 
+export VUE_APP_QUX_MC_CLASSROOM_URL=https://classroom.masterycoding.com // MasteryCoding Classroom URL (for authentication redirects)
+
 ```
+
+**Note:** The `VUE_APP_QUX_MC_CLASSROOM_URL` environment variable is used for MasteryCoding integration. When the `mc_authorization` cookie is not present or token exchange fails, users will be redirected to this URL. Default: `https://classroom.masterycoding.com`
 
 - Start
 ```

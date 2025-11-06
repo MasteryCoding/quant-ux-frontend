@@ -22,22 +22,26 @@ class UserService extends AbstractService{
     }
 
     /**
-     * Exchange authorization cookie for Quant-UX JWT token
+     * Exchange MC authorization cookie for Quant-UX JWT token
      */
     async exchangeToken () {
         try {
             this.logger.info('exchangeToken()', 'Attempting token exchange')
-            const authCookie = Cookies.get('authorization')
+            const mcAuthCookie = Cookies.get('mc_authorization')
             
-            if (!authCookie) {
-                this.logger.info('exchangeToken()', 'No authorization cookie found')
+            if (!mcAuthCookie) {
+                this.logger.info('exchangeToken()', 'No mc_authorization cookie found')
+                // Redirect to classroom URL if no cookie is present
+                const classroomUrl = process.env.VUE_APP_QUX_MC_CLASSROOM_URL || 'https://classroom.masterycoding.com'
+                this.logger.info('exchangeToken()', 'Redirecting to:', classroomUrl)
+                window.location.href = classroomUrl
                 return null
             }
 
             const response = await fetch('/rest/user/token-exchange', {
                 method: 'POST',
                 headers: {
-                    'Authorization': authCookie,
+                    'Authorization': mcAuthCookie,
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include'
@@ -52,9 +56,17 @@ class UserService extends AbstractService{
                 }
             } else {
                 this.logger.error('exchangeToken()', 'Token exchange failed', response.status)
+                // If token exchange fails, redirect to classroom
+                const classroomUrl = process.env.VUE_APP_QUX_MC_CLASSROOM_URL || 'https://classroom.masterycoding.com'
+                this.logger.info('exchangeToken()', 'Token exchange failed, redirecting to:', classroomUrl)
+                window.location.href = classroomUrl
             }
         } catch (error) {
             this.logger.error('exchangeToken()', 'Error during token exchange', error)
+            // On error, redirect to classroom
+            const classroomUrl = process.env.VUE_APP_QUX_MC_CLASSROOM_URL || 'https://classroom.masterycoding.com'
+            this.logger.info('exchangeToken()', 'Error occurred, redirecting to:', classroomUrl)
+            window.location.href = classroomUrl
         }
         return null
     }
@@ -69,8 +81,13 @@ class UserService extends AbstractService{
         Cookies.remove('quxUserLoggedIn', { path: '/' })
         Cookies.remove('authorization')
         Cookies.remove('authorization', { path: '/' })
+        Cookies.remove('mc_authorization')
+        Cookies.remove('mc_authorization', { path: '/' })
         this.user = this.GUEST
-        location.href = "#/"
+        
+        // Redirect to classroom on logout
+        const classroomUrl = process.env.VUE_APP_QUX_MC_CLASSROOM_URL || 'https://classroom.masterycoding.com'
+        window.location.href = classroomUrl
     }
 
     async load () {
