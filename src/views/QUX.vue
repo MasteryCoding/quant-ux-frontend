@@ -75,6 +75,9 @@ export default {
         this.hasHeader = false
 			}
     },
+    reload () {
+      window.location.reload()
+    },
     showErrorDetails (e, trace) {
       if (this.isDebug) {
         this.$refs.errorDialog.show(e, trace)
