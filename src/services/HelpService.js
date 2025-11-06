@@ -37,8 +37,7 @@ class HelpService  {
                     import(/* webpackChunkName: "help" */ 'help/en/analytic_canvas.js'),
 
                     import(/* webpackChunkName: "help" */ 'help/en/support.js'),
-                    import(/* webpackChunkName: "help" */ 'help/en/bugs.js'),
-                    import(/* webpackChunkName: "help" */ 'help/en/contact.js')
+                    import(/* webpackChunkName: "help" */ 'help/en/bugs.js')
                     // import(/* webpackChunkName: "help" */ 'help/en/task.js')
                 ]).then(all => {
                     this.texts = all.flatMap(t => t.texts)
