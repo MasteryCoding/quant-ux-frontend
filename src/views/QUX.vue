@@ -2,7 +2,7 @@
   <div class="Matc">
     <div class="MatcContainer">
       <QHeader :user="user" @login="onLogin" @logout="onLogout" v-if="hasHeader"/>
-      <router-view :user="user" @login="onLogin" @logout="onLogout" @reload="reload"/>
+      <router-view :user="user" @login="onLogin" @logout="onLogout"/>
     </div>
     <ErrorDialog ref="errorDialog"/>
   </div>
