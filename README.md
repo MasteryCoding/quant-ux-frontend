@@ -49,6 +49,12 @@ If you're using the provided `docker/docker-compose.yml`, you can simply add the
       - ../src:/home/node/src
 ```
 
+For local development without the production stages you can also build directly from the new `Dockerfile.local`:
+```bash
+docker build -f Dockerfile.local -t quant-ux-frontend-local .
+docker run --rm -p 8082:8082 quant-ux-frontend-local
+```
+
 You can then make use of the following Makefile rules for quick docker environment setup and teardown:
 ```bash
 # docker compose up - targets docker/docker-compose.yml

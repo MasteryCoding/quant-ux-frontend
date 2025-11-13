@@ -9,13 +9,6 @@ WORKDIR /home/node
 COPY --chown=node:node ["package*.json", "./"]
 RUN npm clean-install --omit=dev
 
-FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS all-dependencies
-USER node
-WORKDIR /home/node
-
-COPY --chown=node:node ["package*.json", "./"]
-RUN npm clean-install
-
 FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 USER node
@@ -36,17 +29,3 @@ COPY --chown=node:node ["server/", "./server"]
 COPY --chown=node:node ["public/", "./public"]
 
 CMD [ "node", "server/start.js" ]
-
-
-# placed last since if the person targeting runtime-production doesn't have BuildKit installed, it'll build everything until the targeted stage
-# see: https://docs.docker.com/build/building/multi-stage/#differences-between-legacy-builder-and-buildkit
-FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS runtime-development
-
-USER node
-WORKDIR /home/node
-
-COPY --chown=node:node --from=all-dependencies ["/home/node/node_modules", "node_modules/"]
-COPY --chown=node:node [".", "./"]
-COPY --chown=node:node --from=builder ["/home/node/dist", "dist/"]
-
-CMD [ "npm", "run", "serve", "--", "--port", "8082" ]
