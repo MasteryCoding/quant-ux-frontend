@@ -4,8 +4,14 @@ import router from './router';
 import VueI18n from 'vue-i18n';
 
 import Services from 'services/Services';
+import Logger from 'common/Logger';
 
 async function start() {
+  const logLevel = process.env.VUE_APP_LOG_LEVEL !== undefined
+    ? Number(process.env.VUE_APP_LOG_LEVEL)
+    : (process.env.NODE_ENV !== 'production' ? 5 : 0);
+  Logger.setDebugLevel(logLevel);
+
   await Services.initConfig();
   await Services.getUserService().load();
 
