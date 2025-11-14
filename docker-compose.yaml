@@ -4,17 +4,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.local
-      args:
-        QUX_HTTP_PORT: ${QUX_HTTP_PORT:-8082}
     container_name: quant-ux-frontend
     env_file:
       - .env
-    environment:
-      QUX_HTTP_PORT: ${QUX_HTTP_PORT:-8082}
-      CHOKIDAR_USEPOLLING: "true"
-      HOST: 0.0.0.0
-    ports:
-      - "${QUX_HTTP_PORT:-8082}:${QUX_HTTP_PORT:-8082}"
     restart: unless-stopped
     develop:
       watch:
@@ -29,9 +21,15 @@ services:
             - .env.development.local
             - .env.test.local
             - .git/
+        - action: restart
+          path: vue.config.js
         - action: rebuild
           path: package.json
         - action: rebuild
           path: package-lock.json
         - action: rebuild
           path: yarn.lock
+        - action: rebuild
+          path: Dockerfile.local
+        - action: rebuild
+          path: docker-compose.yaml

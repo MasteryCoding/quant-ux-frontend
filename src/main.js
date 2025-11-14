@@ -7,9 +7,12 @@ import Services from 'services/Services';
 import Logger from 'common/Logger';
 
 async function start() {
-  const logLevel = process.env.VUE_APP_LOG_LEVEL !== undefined
-    ? Number(process.env.VUE_APP_LOG_LEVEL)
-    : (process.env.NODE_ENV !== 'production' ? 5 : 0);
+  const logLevel =
+    process.env.VUE_APP_LOG_LEVEL !== undefined
+      ? Number(process.env.VUE_APP_LOG_LEVEL)
+      : process.env.NODE_ENV !== 'production'
+      ? 5
+      : 0;
   Logger.setDebugLevel(logLevel);
 
   await Services.initConfig();
@@ -23,14 +26,11 @@ async function start() {
     i18n: new VueI18n({
       locale: 'en',
       fallbackLocale: 'en',
+      silentFallbackWarn: true,
       messages: {
         'en': require('./nls/en.json'),
         'en-uk': require('./nls/en.json'),
-        'en-us': require('./nls/en.json'),
-        'cn': require('./nls/cn.json'),
-        'de': require('./nls/de.json'),
-        'pt-br': require('./nls/pt_br.json'),
-        'pt': require('./nls/pt_br.json')
+        'en-us': require('./nls/en.json')
       }
     }),
     render: (h) => h(App)

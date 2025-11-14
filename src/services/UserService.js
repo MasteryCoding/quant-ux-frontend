@@ -12,11 +12,7 @@ class UserService extends AbstractService {
       name: 'Guest',
       email: 'guest@quant-ux.com',
       role: 'guest',
-      lastlogin: 0,
-      lastNotification: 0,
-      tos: false,
-      paidUntil: 0,
-      plan: 'Free'
+      lastlogin: 0
     };
   }
 
@@ -24,50 +20,23 @@ class UserService extends AbstractService {
    * Exchange MC authorization cookie for Quant-UX JWT token
    */
   async exchangeToken() {
+    const CLASSROOM_URL = process.env.VUE_APP_QUX_MC_CLASSROOM_URL;
     try {
       this.logger.info('exchangeToken()', 'Attempting token exchange');
-      const mcAuthCookie = Cookies.get('mc_authorization');
-
-      console.log('mcAuthCookie', mcAuthCookie);
-
-      if (!mcAuthCookie) {
-        this.logger.info('exchangeToken()', 'No mc_authorization cookie found');
-        // Redirect to classroom URL if no cookie is present
-        const classroomUrl = process.env.VUE_APP_QUX_MC_CLASSROOM_URL || 'https://classroom.masterycoding.com';
-        this.logger.info('exchangeToken()', 'Redirecting to:', classroomUrl);
-        window.location.href = classroomUrl;
-        return null;
-      }
-
-      const response = await fetch('/rest/user/token-exchange', {
+      const response = await fetch(`${CLASSROOM_URL}/api/auth/token-exchange`, {
         method: 'POST',
-        headers: {
-          'Authorization': mcAuthCookie,
-          'Content-Type': 'application/json'
-        },
         credentials: 'include'
       });
-
-      if (response.ok) {
-        const user = await response.json();
-        if (user && user.token) {
-          this.logger.info('exchangeToken()', 'Token exchange successful');
-          this.setUser(user);
-          return user;
-        }
-      } else {
-        this.logger.error('exchangeToken()', 'Token exchange failed', response.status);
-        // If token exchange fails, redirect to classroom
-        const classroomUrl = process.env.VUE_APP_QUX_MC_CLASSROOM_URL || 'https://classroom.masterycoding.com';
-        this.logger.info('exchangeToken()', 'Token exchange failed, redirecting to:', classroomUrl);
-        window.location.href = classroomUrl;
-      }
+      if (!response.ok) throw new Error('Token exchange failed');
+      const hashedToken = await response.json();
+      if (!hashedToken) throw new Error('Invalid token response');
+      this.logger.info('exchangeToken()', 'Token exchange successful');
+      return hashedToken;
     } catch (error) {
       this.logger.error('exchangeToken()', 'Error during token exchange', error);
       // On error, redirect to classroom
-      const classroomUrl = process.env.VUE_APP_QUX_MC_CLASSROOM_URL || 'https://classroom.masterycoding.com';
-      this.logger.info('exchangeToken()', 'Error occurred, redirecting to:', classroomUrl);
-      window.location.href = classroomUrl;
+      this.logger.info('exchangeToken()', 'Error occurred, redirecting to:', CLASSROOM_URL);
+      window.location.href = CLASSROOM_URL;
     }
     return null;
   }
@@ -82,12 +51,10 @@ class UserService extends AbstractService {
     Cookies.remove('quxUserLoggedIn', { path: '/' });
     Cookies.remove('authorization');
     Cookies.remove('authorization', { path: '/' });
-    Cookies.remove('mc_authorization');
-    Cookies.remove('mc_authorization', { path: '/' });
     this.user = this.GUEST;
 
     // Redirect to classroom on logout
-    const classroomUrl = process.env.VUE_APP_QUX_MC_CLASSROOM_URL || 'https://classroom.masterycoding.com';
+    const classroomUrl = process.env.VUE_APP_QUX_MC_CLASSROOM_URL;
     window.location.href = classroomUrl;
   }
 
@@ -115,17 +82,37 @@ class UserService extends AbstractService {
       }
 
       // If no valid user, try token exchange
-      const user = await this.exchangeToken();
-      if (user) {
-        this.user = user;
+      const exchangedToken = await this.exchangeToken();
+
+      if (!exchangedToken) {
+        this.user = this.GUEST;
+        this.logger.info('load()', 'No valid authentication, using guest');
+        return this.user;
+      } else {
+        try {
+          this.setToken(exchangedToken.accessToken);
+          const response = await this._post('/rest/user/token-exchange', {}, (user) => {
+            this.user = user;
+            this.logger.info('load()', 'Valid authentication, using user');
+            return this.user;
+          });
+          if (response) {
+            this.user = response;
+            this.setTTL(response);
+            this.setToken(response.token);
+            this.logger.info('load()', 'Valid authentication, using user');
+            this.logger.info(response);
+            return this.user;
+          }
+        } catch (error) {
+          // Endpoint doesn't exist (404) or other error - fall back to guest
+          this.logger.warn('load()', 'Token exchange endpoint not available, using guest mode', error);
+        }
+        this.user = this.GUEST;
+        this.logger.info('load()', 'No valid authentication, using guest');
         return this.user;
       }
-
-      // Default to guest
-      this.logger.info('load()', 'No valid authentication, using guest');
-      this.user = this.GUEST;
     }
-    return this.user;
   }
 
   async loadById(id) {
