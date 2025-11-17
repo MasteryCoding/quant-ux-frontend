@@ -88,7 +88,12 @@ export default {
 
 			} else {
 				if (Math.abs(this.lastMouseWheel - now) > 1 ){
-					this.canvasPos.y -= Math.round(delta.pixelY / 2);
+					// Shift + Scrollwheel converts vertical scroll to horizontal scroll
+					if (e.shiftKey && delta.pixelY) {
+						this.canvasPos.x -= Math.round(delta.pixelY / 2);
+					} else {
+						this.canvasPos.y -= Math.round(delta.pixelY / 2);
+					}
 					if(delta.pixelX){
 						this.canvasPos.x -= Math.round(delta.pixelX / 2);
 					}

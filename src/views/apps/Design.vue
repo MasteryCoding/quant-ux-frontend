@@ -63,8 +63,9 @@ export default {
     onMouseWheel (e) {
       /**
        * Cancel all left and right swipes to surpress back navigation
+       * Also prevent default for Shift + Scrollwheel to enable horizontal scrolling
        */
-      if (e && Math.abs(e.deltaX) > 50 ) {
+      if (e && (Math.abs(e.deltaX) > 50 || e.shiftKey)) {
         this.logger.log(-1, "onMouseWheel", "cancel");
         e.preventDefault();
       }
