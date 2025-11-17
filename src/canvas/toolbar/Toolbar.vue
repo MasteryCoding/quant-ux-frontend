@@ -46,10 +46,9 @@
 							<CreateVectorButton @add="onToolSVG" v-if="false" />	
 
 
-							<div :class="['MatcToolbarItem MatcToolbarPrimaryItem vommondToolTipCntr', {'MatcToolbarItemSelected': selectedButton === 'addComment'} ]" data-dojo-attach-point="commentBtn"  @click="onNewComment" v-show="hasScreens">
+							<div :class="['MatcToolbarItem MatcToolbarPrimaryItem vommondToolTipCntr', {'MatcToolbarItemSelected': selectedButton === 'addComment'} ]" data-dojo-attach-point="commentBtn"  @click="onNewComment" v-show="false">
 								<QIcon icon="Comment" />
 							</div>		
-							
 						</div>
 							
 
@@ -394,13 +393,13 @@ export default {
 			this.logger.log(-1,"onExit", "entry > " + this.pub);
 			this.active = false;
 			if(this.pub){
-				if(this.model.id){
+				if(this.model && this.model.id){
 					hash("#/examples/"+ this.model.id + ".html");
 				} else {
 					hash("#/");
 				}
 			} else {
-				if (this.redirectAfterExit){
+				if (this.redirectAfterExit && this.model && this.model.id){
 					hash("#/apps/"+ this.model.id + ".html");
 				} else {
 					this.logger.log(-1,"onExit", "exit >> Do not redictect!");
