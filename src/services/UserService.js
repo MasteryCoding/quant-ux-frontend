@@ -36,7 +36,7 @@ class UserService extends AbstractService {
       this.logger.error('exchangeToken()', 'Error during token exchange', error);
       // On error, redirect to classroom
       this.logger.info('exchangeToken()', 'Error occurred, redirecting to:', CLASSROOM_URL);
-      window.location.href = CLASSROOM_URL;
+      window.location.href = new URL('/auth?redirect=' + window.location.href, CLASSROOM_URL);
     }
     return null;
   }
@@ -96,14 +96,15 @@ class UserService extends AbstractService {
             this.logger.info('load()', 'Valid authentication, using user');
             return this.user;
           });
-          if (response) {
-            this.user = response;
-            this.setTTL(response);
-            this.setToken(response.token);
-            this.logger.info('load()', 'Valid authentication, using user');
-            this.logger.info(response);
-            return this.user;
+          if (!response) {
+            throw new Error('Invalid token response' + JSON.stringify(response));
           }
+          this.user = response;
+          this.setTTL(response);
+          this.setToken(response.token);
+          this.logger.info('load()', 'Valid authentication, using user' + JSON.stringify(response));
+          this.logger.info(response);
+          return this.user;
         } catch (error) {
           // Endpoint doesn't exist (404) or other error - fall back to guest
           this.logger.warn('load()', 'Token exchange endpoint not available, using guest mode', error);

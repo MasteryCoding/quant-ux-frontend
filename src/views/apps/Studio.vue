@@ -63,31 +63,7 @@
                             </span>
                         </a>
                     </div>
-                    
-
-                    <div class="MatcStudioNavRow"  v-if="!pub">
-                        <a class="MatcLink MatcStudioNavItem" href="#/my-account.html" >
-                            <QIcon icon="Account" v-if="!hasUserImage" ></QIcon>
-                            <span class="MatcUserImageCntr " v-else>
-                                <img class="MatcUserImage" :src="userImage">
-                            </span>
-                            <span class="MatcCollapseViewMinHidden">
-                                {{userName}}
-                            </span>
-
-                        </a>
-                    </div>
-
-                    <!-- <div class="MatcStudioNavRow">
-                        <a class="MatcLink" @click="onLogout">
-                            <QIcon icon="Logout"/>
-                            <span class="MatcCollapseViewMinHidden">
-                                {{ $t('app.logout') }}       
-                            </span>
-                              
-                        </a>
-                    </div>        -->
-          
+                  
                 </div>
    
         
@@ -161,12 +137,6 @@ export default {
                 return this.apps.slice(0, 10) 
             }
             return this.apps
-        },
-        hasUserImage () {
-            return false
-        },
-        userName () {
-            return 'My Account'
         },
         urlPrefix () {
             if (!this.pub) {

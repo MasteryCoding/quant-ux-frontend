@@ -42,10 +42,6 @@ export default {
       hasCarret: false,
       options: [
         {
-          label: this.$t('header.my-account'),
-          value: "#/my-account.html"
-        },
-        {
           label: this.$t('header.logout'),
           value: "#/logout.html"
         }
