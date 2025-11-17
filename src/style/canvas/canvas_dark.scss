@@ -1,58 +1,127 @@
 .MatcDark {
-
+    // Override theme variables for dark theme
+    // Grayscale (Dark theme)
+    $gray_50: #010C19;
+    $gray_100: #05101F;
+    $gray_200: #0F1926;
+    $gray_300: #1C2633;
+    $gray_400: #37414C;
+    $gray_500: #525B66;
+    $gray_600: #899099;
+    $gray_700: #BFC5CC;
+    $gray_800: #E7EDF2;
+    $gray_900: #F5FAFF;
+    
+    // Primary Colors (Dark theme)
+    $primary_color: #50A1FF;
+    $primary_color_hover: #3D8FE6; // Approximate darker
+    $primary_color_trans: rgba(80, 161, 255, 0.1);
+    $primary_light: #6BB3FF; // Approximate lighter
+    $primary_dark: #2A7FE6; // Approximate darker
+    
+    // Success Colors (Dark theme)
+    $color_success: #34E38F;
+    $color_success_hover: #28C97A; // Approximate darker
+    $success_light: #4FE9A5; // Approximate lighter
+    $success_dark: #1DBD75; // Approximate darker
+    
+    // Warning Colors (Dark theme)
+    $color_warning: #FFAF14;
+    $warning_light: #FFC147; // Approximate lighter
+    $warning_dark: #CC8C10; // Approximate darker
+    
+    // Error/Danger Colors (Dark theme)
+    $color_danger: #FF6788;
+    $color_danger_hover: #E64D6E; // Approximate darker
+    $color_danger_light: #FF8AA5; // Approximate lighter
+    $error_light: $color_danger_light;
+    $error_dark: #E64D6E;
+    
+    // Canvas colors
+    $canvas_container_bg: $gray_300;
+    $canvas_frame_bg: $gray_50;
+    $canvas_screen_shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    $canvas_line_support_border: $gray_400;
+    $dialog_tab_color: $gray_800;
+    $tree_item_color: $toolbar_color;
+    $tree_item_icon_color: $gray_600;
+    $tree_item_icon_selected_color: $gray_900;
 
     .MatcDialog .MatcToolbarTabs a {
-        color: #333;
+        color: $dialog_tab_color;
     }
 
     .MatcDialog .MatcToolbarTabs a.MatcToolbarTabDisabled,
     .MatcDialog .MatcToolbarTabs a.MatcToolbarTabDisabled:hover {
-        color: #777;
+        color: $dialog_tab_disabled_color;
         cursor: auto;
     }
-
 
     /****************************************************
     * Canvas Dark
     ****************************************************/
 
     .MatcScreen {
-        box-shadow: 0 0 10px #333;
+        box-shadow: $canvas_screen_shadow;
     }
 
     .MatcCanvasContainer {
-        background: #202427;
+        background: $canvas_container_bg;
         box-shadow: none;
     }
 
     .MatcLineSupportPointTouch {
-        border-color: #383e43;
+        border-color: $canvas_line_support_border;
     }
 
     .MatcCanvasFrame {
-        background: #000;
+        background: $canvas_frame_bg;
     }
 
+    // Tree/Layer List - Dark theme overrides for better contrast
     .MatcTreeItem {
-        color: $toolbar_color;
+        color: $gray_800; // Lighter text for better contrast
     }
 
     .MatcTreeItemRow:hover {
-        color: $toolbar_color;
+        color: $gray_900; // Even lighter on hover
     }
 
     .MatcTreeItem .mdi {
-        color: #999;
+        color: $gray_700; // Lighter icons for better visibility
     }
 
     .MatcTreeItem.MatcTreeItemSelected .mdi {
-        color: #fff;
+        color: $gray_900; // Very light icons when selected
     }
 
     .MatcTreeItem.MatcTreeItemSelected,
     .MatcTreeItemSelected .MatcTreeItem {
-        background: $layerlist_selected;
+        background: rgba(80, 161, 255, 0.15); // Subtle primary color tint instead of white
     }
-
-
+    
+    .MatcTreeItemSelected .MatcTreeItemRow {
+        color: $gray_900; // Light text when selected
+    }
+    
+    // Widget headings (Screen labels) - better contrast
+    .MatcToolbarLayerListScreenLabel {
+        color: $gray_700 !important; // Lighter color for better contrast
+        font-weight: 500; // Slightly bolder for hierarchy
+    }
+    
+    // Tree toggle icons
+    .MatcTree .MatcTreeToggleChildrenIcon {
+        color: $gray_600; // Lighter for visibility
+    }
+    
+    .MatcTree .MatcTreeToggleChildrenIcon:hover {
+        color: $gray_800; // Even lighter on hover
+    }
+    
+    // Tree type icons
+    .MatcTreeTypeIcon.mdi,
+    .MatcTreeTypeIcon svg {
+        opacity: 0.7; // More visible in dark mode
+    }
 }

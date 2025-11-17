@@ -1,36 +1,52 @@
 .MatcLight {
-   
-    $toolbar_background: #fff;
-    $toolbar_selected_background: rgba(0,0,0,0.1);
-    $toolbar_border: rgba(0,0,0,0.1); // rgba(255,255,255,0.08);
+    // Light theme grayscale
+    $gray_50: #FFFFFF;
+    $gray_100: #FBFBFC;
+    $gray_200: #F2F4F7;
+    $gray_300: #E5E8ED;
+    $gray_400: #C7CCD3;
+    $gray_500: #AFB5BF;
+    $gray_600: #9298A2;
+    $gray_700: #747B84;
+    $gray_800: #575D67;
+    $gray_900: #394049;
+    
+    // Primary Colors (Light theme)
+    $primary_color: #0453AE;
+    $primary_color_hover: #03408A;
+    
+    // Toolbar colors
+    $toolbar_background: $gray_50;
+    $toolbar_selected_background: $gray_200;
+    $toolbar_border: $gray_300;
  
-    $toolbar_color: #333;
-    $toolbar_color_hover: #333;
-    $toolbar_color_passive: #777;
+    $toolbar_color: $gray_900;
+    $toolbar_color_hover: $gray_900;
+    $toolbar_color_passive: $gray_600;
 
     $toolbar_form_background: $toolbar_background;
-    $toolbar_form_active_background: rgba(0,0,0,0.1);
-    $toolbar_form_background_hover: rgba(0,0,0, .05);
-    $toolbar_form_background_focus: rgba(0,0,0,0.1);
+    $toolbar_form_active_background: $gray_200;
+    $toolbar_form_background_hover: $gray_200;
+    $toolbar_form_background_focus: $gray_200;
     $toolbar_form_border: $toolbar_border;
     $toolbar_form_border_hover: $toolbar_border;
-    $toolbar_form_border_focus: rgba(0,0,0,0.15);
+    $toolbar_form_border_focus: $gray_400;
     $toolbar_form_radius: 2px;
 
-    $toolbar_help_background: #d6e5f884;
-    $toolbar_help_color: #172b7f;
+    $toolbar_help_background: rgba(4, 83, 174, 0.1); // primary-10p approximation
+    $toolbar_help_color: $primary_color;
 
-    $layerlist_background: #fff;
+    $layerlist_background: $gray_50;
     $layerlist_selected: $toolbar_selected_background;
-    $layerlist_chevron_color: #777;
-    $layerlist_chevron_color_hover: #333;
+    $layerlist_chevron_color: $gray_600;
+    $layerlist_chevron_color_hover: $gray_800;
 
-    $create_element_background: #f2f2f2;
+    $create_element_background: $gray_200;
 
     $popup_color: $toolbar_color;
     $popup_border: transparent;
     $popup_outer_border_color: transparent;
-    $popup_background: #fff;
+    $popup_background: $gray_50;
     $popup_radius: 4px;
     $popup_shadow: 0 3px 25px rgba(0,0,0,.35);
     $popup_line: rgba(0, 0, 0, 0.08);
@@ -52,7 +68,9 @@
 
     $toolbar_checkbox_hover_background: $toolbar_form_background_hover;
     $toolbar_checkbox_hover_border: $toolbar_form_border_hover;
-
+    
+    // Import common styles with light theme variables
+    @import './toolbar_theme_common.scss';
     @import './toolbar_theme.scss';
     @import './toolbar_edit_mode.scss';
 

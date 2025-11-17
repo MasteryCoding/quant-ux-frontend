@@ -1,151 +1,191 @@
-$main_color: #617be4;
+// ============================================
+// Personal Theme Colors
+// ============================================
+// Default values are for light theme, overridden in dark theme files
 
-$primary_color: #365fff;
-$primary_color_hover: #123ef0;
-$primary_color_trans: #d6e5f884;
+// Grayscale (Light theme defaults)
+$gray_50: #FFFFFF;
+$gray_100: #FBFBFC;
+$gray_200: #F2F4F7;
+$gray_300: #E5E8ED;
+$gray_400: #C7CCD3;
+$gray_500: #AFB5BF;
+$gray_600: #9298A2;
+$gray_700: #747B84;
+$gray_800: #575D67;
+$gray_900: #394049;
 
-$color_danger: #f94c4c;
-$color_danger_light: #f7dddd;
-$color_danger_hover: #f83a3a;
-$color_passive: #777;
-$color_success: rgb(53, 198, 27);
-$color_success_hover: rgb(41, 184, 15);
+// Legacy gray mappings (for backwards compatibility)
+$white: $gray_50;
+$gray_1: $gray_300;
+$gray_2: $gray_400;
+$gray_3: $gray_500;
+$gray_4: $gray_700;
+$gray_5: $gray_800;
+$gray_6: $gray_200;
+$black: $gray_900;
 
-$canvas_selection: #365fff;
-$canvas_selection_grid_resize: #dd1787;
-$canvas_distance: #f94c4c;
-$canvas_snapp: #f94c4c;
-$canvas_snapp_middle: #f94c4c;
+// Primary Colors (Light theme defaults)
+$primary_color: #0453AE;
+$primary_color_hover: #03408A; // Approximate darker
+$primary_color_trans: rgba(4, 83, 174, 0.1); // primary-10p approximation
+$primary_light: #1A6BC4; // Approximate lighter
+$primary_dark: #023A75; // Approximate darker
+$primary_fade: rgba(4, 83, 174, 0.1); // primary-fade approximation
 
-$white: #fff;
-$gray_1: #dbdbdb;
-$gray_2: #c4c3c3;
-$gray_3: #b4b3b3;
-$gray_4: #555;
-$gray_5: #4a4a4a;
-$gray_6: #F3F5F6;
-$black: #111;
+// Success Colors (Light theme defaults)
+$color_success: #129254;
+$color_success_hover: #0E7A43; // Approximate darker
+$success_light: #1BA865; // Approximate lighter
+$success_dark: #0A6B3D; // Approximate darker
+$success_fade: rgba(18, 146, 84, 0.1);
 
+// Warning Colors (Light theme defaults)
+$color_warning: #F4A100;
+$warning_light: #F5B133; // Approximate lighter
+$warning_dark: #C38100; // Approximate darker
+$warning_fade: rgba(244, 161, 0, 0.1);
 
-$page_color: #FFF; // rgb(250, 250, 250); // #e6e6e6; //
-$page_color_secondary: rgb(250, 250, 250); //F3F5F6
-$page_color_secondary_dark: #F3F5F6;
-$page_border: #dbdbdb; // #CFCFCF;
+// Error/Danger Colors (Light theme defaults)
+$color_danger: #F52A56;
+$color_danger_hover: #C42144; // Approximate darker
+$color_danger_light: #F75A7A; // Approximate lighter
+$error_light: $color_danger_light;
+$error_dark: #C42144; // Approximate darker
+$error_fade: rgba(245, 42, 86, 0.1);
+
+// Legacy mappings
+$main_color: $primary_color;
+$color_passive: $gray_600;
+
+// Canvas Colors
+$canvas_selection: $primary_color;
+$canvas_selection_grid_resize: #dd1787; // Keep existing for now
+$canvas_distance: $color_danger;
+$canvas_snapp: $color_danger;
+$canvas_snapp_middle: $color_danger;
+
+// Page Colors (Light theme defaults)
+$page_color: $gray_50;
+$page_color_secondary: $gray_100;
+$page_color_secondary_dark: $gray_200;
+$page_border: $gray_300;
 $page_drop_shadow_soft: 0 4px 24px rgba(0,0,0,0.04);
 $page_drop_shadow_more: 0 8px 24px rgba(0,0,0,0.1);
 $page_drop_shadow_xxl: 0 4px 24px rgba(0,0,0,0.16);
-$page_radius:8px;
-$page_radius_xs:8px;
-$page_radius-l:12px;
+$page_radius: 8px;
+$page_radius_xs: 8px;
+$page_radius-l: 12px;
 
-$kpi_background:#F3F5F6;
+$kpi_background: $gray_200;
 
-$text_color: #333;
-$text_color_hover : #111;
-$text_color_passive: #777;
-$text_color_dark: #111;
+// Text Colors (Light theme defaults)
+$text_color: $gray_900;
+$text_color_hover: $gray_800;
+$text_color_passive: $gray_600;
+$text_color_dark: $gray_900;
 $text_line_height: 1.5;
 
-$comment_background: #fff4cc;
-$comment_border: #fff4cc;
+$comment_background: rgba(244, 161, 0, 0.1); // warning-fade approximation
+$comment_border: rgba(244, 161, 0, 0.2);
 $comment-shadow: none;
 $comment_radius: 8px;
-$comment_input_background: rgba($color: #000000, $alpha: 0.1);
-$comment_input_border: rgba($color: #000000, $alpha: 0.2);
-$comment_input_border_hover: rgba($color: #000000, $alpha: 0.3);
+$comment_input_background: rgba(0, 0, 0, 0.05);
+$comment_input_border: rgba(0, 0, 0, 0.1);
+$comment_input_border_hover: rgba(0, 0, 0, 0.15);
 
+// Toolbar Colors (Light theme defaults - will be overridden in dark theme)
 $toolbar_height: 48px;
-$toolbar_background: #25292F;
-$toolbar_color: $white;
-$toolbar_color_hover: $white;
-$toolbar_color_passive: $gray_3;
-$toolbar_color_disabled: $gray_4;
-$toolbar_selected_background: #16191b;
-$toolbar_border: rgb(49, 55, 60);
-$toolbar_padding:8px;
+$toolbar_background: $gray_50;
+$toolbar_color: $gray_900;
+$toolbar_color_hover: $gray_900;
+$toolbar_color_passive: $gray_600;
+$toolbar_color_disabled: $gray_500;
+$toolbar_selected_background: $gray_200;
+$toolbar_border: $gray_300;
+$toolbar_padding: 8px;
 
 $toolbar_form_background: $toolbar_background;
-$toolbar_form_active_background: #202427;
-$toolbar_form_background_hover: #202427;
-$toolbar_form_background_focus: #16191b;
+$toolbar_form_active_background: $gray_200;
+$toolbar_form_background_hover: $gray_200;
+$toolbar_form_background_focus: $gray_200;
 $toolbar_form_border: $toolbar_border;
-$toolbar_form_border_light: rgb(64, 74, 83);
+$toolbar_form_border_light: $gray_300;
 $toolbar_form_border_hover: $toolbar_border;
-$toolbar_form_border_focus: rgba(255,255,255,0.16);
+$toolbar_form_border_focus: $gray_400;
 $toolbar_form_radius: 4px;
-$toolbar_checkbox_background: #484E53;
-$toolbar_checkbox_border: #484E53;
-$toolbar_checkbox_hover_background: #484E53;
-$toolbar_checkbox_hover_border: #484E53;
+$toolbar_checkbox_background: $gray_200;
+$toolbar_checkbox_border: $gray_300;
+$toolbar_checkbox_hover_background: $gray_200;
+$toolbar_checkbox_hover_border: $gray_400;
 $toolbar_checkbox_selected_background: $primary_color;
-$toolbar_checkbox_selected_hook: #fff;
+$toolbar_checkbox_selected_hook: $gray_50;
 $toolbar_tab_border_color: $primary_color;
-$toolbar_section_content_gap:4px;
+$toolbar_section_content_gap: 4px;
 
-$toolbar_help_background: rgba(255,255,255, 0.1);
-$toolbar_help_color: #fff;
-$toolbar_help_border: #d6e5f8;
+$toolbar_help_background: rgba(4, 83, 174, 0.1); // primary-10p approximation
+$toolbar_help_color: $primary_color;
+$toolbar_help_border: rgba(4, 83, 174, 0.2);
 
-$color_picker_border: rgba(255,255,255, 0.25);
-$color_picker_border-hover: rgba(255,255,255, 0.35);
+$color_picker_border: rgba(0, 0, 0, 0.25);
+$color_picker_border-hover: rgba(0, 0, 0, 0.35);
 
 $layerlist_width: 256px;
-$layerlist_background: red;
+$layerlist_background: $gray_50;
 $layerlist_selected: $toolbar_selected_background;
-$layerlist_chevron_color: $gray_4;
-$layerlist_chevron_color_hover: $gray_2;
+$layerlist_chevron_color: $gray_600;
+$layerlist_chevron_color_hover: $gray_800;
 
-$create_element_background: #25292f;
+$create_element_background: $gray_200;
 
-$popup_color: $white;
-$popup_color_passive: $color_passive;
+$popup_color: $gray_900;
+$popup_color_passive: $gray_600;
 $popup_outer_border_color: transparent;
 $popup_border: $toolbar_border;
-$popup_background: $toolbar_selected_background;
+$popup_background: $gray_50;
 $popup_radius: 8px;
 $popup_font_size: 14px;
 $popup_padding: 4px 8px;
-$popup_shadow: none;
+$popup_shadow: 0 3px 25px rgba(0,0,0,.35);
 $popup_child_shadow: none;
-$popup_line: rgba(255, 255, 255, 0.08);
+$popup_line: rgba(0, 0, 0, 0.08);
 $popup_form_color: $text_color;
-$popup_form_border: $toolbar_border;
-$popup_form_border_hover: $toolbar_border;
-$popup_form_border_focus: $toolbar_border;
+$popup_form_border: $gray_300;
+$popup_form_border_hover: $gray_300;
+$popup_form_border_focus: $gray_400;
 $popup_form_background: $toolbar_form_background;
 $popup_form_background_hover: $toolbar_form_background_hover;
 $popup_form_background_focus: $toolbar_form_background_hover;
 $popup_button_link_color: $text_color;
-$popup_button_link_color_hover: $text_color;
+$popup_button_link_color_hover: $text_color_hover;
 $popup_child_border: none;
 $popup_button_link_background_hover: rgba(0, 0, 0, 0.05);
 
 $form_color: $text_color;
 $form_radius: 8px;
 $form_border: $page_border;
-$form_border_hover: $gray_2;
-$form_border_focus: $gray_3;
-$form_shadow:none;
+$form_border_hover: $gray_400;
+$form_border_focus: $gray_500;
+$form_shadow: none;
 $form_padding: 8px 8px;
-$form_height:38px;
-$form_font_size:16px;
+$form_height: 38px;
+$form_font_size: 16px;
 
-$dialog_padding:  32px 32px 32px;
-$dialog_padding-l:  40px 40px 40px;
+$dialog_padding: 32px 32px 32px;
+$dialog_padding-l: 40px 40px 40px;
 $dialog_color: $text_color;
 $dialog_form_border: $form_border;
 $dialog_table_background: rgba(0,0,0, .05);
 $dialog_table_border: rgba(0,0,0, .1);
 
+$table_background_header: $gray_200;
+$table_background: rgba(0,0,0, .05);
+$table_selected: $gray_300;
 
-$table_background_header:rgb(230, 230, 230);
-$table_background:rgba(0,0,0, .05);
-$table_selected: $gray_2;
-
-$button_background: #25292F;
-$button_background_hover: #16191b;
-$button_color: $white;
-$button_color_hover: $white;
+$button_background: $primary_color;
+$button_background_hover: $primary_color_hover;
+$button_color: $gray_50;
+$button_color_hover: $gray_50;
 $button_font_size: 16px;
 $button_font_size-s: 14px;
 $button_padding: 4px 24px;
@@ -154,12 +194,12 @@ $button_radius: 8px;
 $button_radius_s: 8px;
 $button_radius-input: 2px;
 $button_radius-l: 12px;
-$button_height:38px;
+$button_height: 38px;
 
-$button_secondary_background: #F3F5F6;// #E6E6E6;
-$button_secondary_background_hover: #E6E6E6;
-$button_secondary_color: #333;
-$button_secondary_color_hover: #000;
+$button_secondary_background: $gray_200;
+$button_secondary_background_hover: $gray_300;
+$button_secondary_color: $gray_900;
+$button_secondary_color_hover: $gray_800;
 
 $tab_color_active: $button_background_hover;
 
@@ -175,7 +215,7 @@ $spacing-xs:4px;
 $font-weight-s: 300;
 $font-weight-m: 400;
 $font-weight-l: 600;
-$font-family: 'Inter', 'Helvetica Neue', -apple-system, 'BlinkMacSystemFont', "Segoe UI", 'Helvetica', sans-serif;
+$font-family: "Rubik", 'Helvetica Neue', -apple-system, 'BlinkMacSystemFont', "Segoe UI", 'Helvetica', sans-serif;
 
 $font-size-xxl: 1.8rem;
 $font-size-xl: 1.6rem;
@@ -186,5 +226,48 @@ $font-size-default: 18px;
 $font-size-s: 16px;
 $font-size-xs: 14px;
 $font-size-xxs: 12px;
+
+// ============================================
+// Theme Colors - Canvas & UI
+// ============================================
+// These can be overridden in theme-specific files
+
+// Canvas Background Colors (Light theme defaults)
+$canvas_container_bg: $gray_200;
+$canvas_frame_bg: $gray_300;
+$canvas_screen_shadow: 0 0 20px rgba(0, 0, 0, 0.25);
+
+// Canvas UI Colors (Light theme defaults)
+$canvas_line_support_border: $gray_400;
+$canvas_grid_handle_color: $gray_800;
+$canvas_grid_handle_delete_color: $color_danger;
+$canvas_resize_element_bg: $gray_50;
+$canvas_resize_element_border: $gray_300;
+$canvas_resize_pin_bg: $gray_500;
+$canvas_resize_grow_line_bg: $gray_500;
+
+// Dialog Colors (Light theme defaults)
+$dialog_tab_color: $gray_800;
+$dialog_tab_disabled_color: $gray_600;
+$dialog_themed_bg: $gray_200;
+
+// Tree/Layer List Colors (Light theme defaults)
+$tree_item_color: $gray_900;
+$tree_item_icon_color: $gray_600;
+$tree_item_icon_selected_color: $gray_50;
+$tree_item_selected_bg: $layerlist_selected;
+
+// Toolbar Detail Colors (Light theme defaults)
+$toolbar_detail_label_color: $gray_600;
+$toolbar_color_indicator_border: rgba(0, 0, 0, 0.15);
+$toolbar_color_indicator_border_hover: rgba(0, 0, 0, 0.35);
+$toolbar_section_marker_opacity: 0.5;
+
+// Design Token Colors (Light theme defaults)
+$design_token_label_color: $gray_900;
+$design_token_label_bg: none;
+
+// Toolbar Home Section (Light theme defaults)
+$toolbar_home_section_color: $gray_50;
 
 

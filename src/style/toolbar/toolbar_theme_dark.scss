@@ -1,17 +1,75 @@
 
-$popup_form_border: rgb(64, 74, 83);
-$popup_form_border_hover: rgba(255,255,255,0.25);
-$popup_form_border_focus: rgba(255,255,255,0.35);
-$popup_button_link_color: rgb(64, 74, 83);
-$popup_button_link_color_hover: #ffffff93;
-$popup_button_link_background_hover: rgba(255,255,255,0.05);
-$popup_form_background: $popup_background;
-$popup_form_color: #fff;
-$popup_child_border: 1px solid $toolbar_border;
-$popup_child_shadow: none;
 .MatcDark {
-   @import './toolbar_theme.scss';
-   @import './toolbar_edit_mode.scss';
+    // Dark theme grayscale
+    $gray_50: #010C19;
+    $gray_100: #05101F;
+    $gray_200: #0F1926;
+    $gray_300: #1C2633;
+    $gray_400: #37414C;
+    $gray_500: #525B66;
+    $gray_600: #899099;
+    $gray_700: #BFC5CC;
+    $gray_800: #E7EDF2;
+    $gray_900: #F5FAFF;
+    
+    // Primary Colors (Dark theme)
+    $primary_color: #50A1FF;
+    $primary_color_hover: #3D8FE6;
+    
+    // Toolbar colors
+    $toolbar_background: $gray_300;
+    $toolbar_selected_background: $gray_200;
+    $toolbar_border: $gray_400;
+    $toolbar_color: $gray_900;
+    $toolbar_color_hover: $gray_900;
+    $toolbar_color_passive: $gray_600;
+    $toolbar_form_background: $toolbar_background;
+    $toolbar_form_active_background: $gray_300;
+    $toolbar_form_background_hover: $gray_300;
+    $toolbar_form_background_focus: $gray_200;
+    $toolbar_form_border: $toolbar_border;
+    $toolbar_form_border_light: $gray_400;
+    $toolbar_form_border_hover: $toolbar_border;
+    $toolbar_form_border_focus: rgba(255,255,255,0.16);
+    $toolbar_checkbox_background: $gray_500;
+    $toolbar_checkbox_border: $gray_500;
+    $toolbar_checkbox_hover_background: $gray_500;
+    $toolbar_checkbox_hover_border: $gray_500;
+    $toolbar_help_background: rgba(255,255,255, 0.1);
+    $toolbar_help_color: $gray_900;
+    
+    // Popup/form colors
+    $popup_form_border: $gray_400;
+    $popup_form_border_hover: rgba(255,255,255,0.25);
+    $popup_form_border_focus: rgba(255,255,255,0.35);
+    $popup_button_link_color: $gray_400;
+    $popup_button_link_color_hover: rgba(255,255,255,0.58);
+    $popup_button_link_background_hover: rgba(255,255,255,0.05);
+    $popup_form_background: $toolbar_selected_background;
+    $popup_form_color: $gray_900;
+    $popup_child_border: 1px solid $toolbar_border;
+    $popup_child_shadow: none;
+    $popup_background: $toolbar_selected_background;
+    $popup_color: $gray_900;
+    $popup_line: rgba(255, 255, 255, 0.08);
+    
+    // Color picker
+    $color_picker_border: rgba(255,255,255, 0.25);
+    $color_picker_border-hover: rgba(255,255,255, 0.35);
+    
+    // Layer list
+    $layerlist_background: $gray_300;
+    $layerlist_selected: $toolbar_selected_background;
+    $layerlist_chevron_color: $gray_600;
+    $layerlist_chevron_color_hover: $gray_800;
+    
+    // Create element
+    $create_element_background: $gray_300;
+    
+    // Import common styles with dark theme variables
+    @import './toolbar_theme_common.scss';
+    @import './toolbar_theme.scss';
+    @import './toolbar_edit_mode.scss';
 
    .MatcCreateBtnElement .MatcCreateBtnElementPreview {
       .MatcWidgetTypeCheckBoxLabel,
@@ -22,6 +80,19 @@ $popup_child_shadow: none;
       .MatchWidgetTypeLabel{
          filter: invert(100%);
       }
+   }
+   
+   // Layer list specific dark theme overrides
+   .MatcToolbarLayerList.MatcToobarPropertiesSection {
+       border-top: 1px solid $gray_400; // Lighter border for visibility
+   }
+   
+   .MatcToolbarLayerList.MatcToobarPropertiesSection .MatcToolbarSectionLabel {
+       background: $gray_200; // Darker background for section labels
+   }
+   
+   .MatcLayerListWidget:hover {
+       background: rgba(255, 255, 255, 0.08); // Subtle white overlay instead of black
    }
 }
 
