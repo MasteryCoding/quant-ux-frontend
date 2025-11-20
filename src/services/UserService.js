@@ -1,6 +1,7 @@
 import AbstractService from './AbstractService';
 import Logger from '../common/Logger';
 import Cookies from 'js-cookie';
+import Services from './Services';
 
 class UserService extends AbstractService {
   constructor() {
@@ -20,7 +21,12 @@ class UserService extends AbstractService {
    * Exchange MC authorization cookie for Quant-UX JWT token
    */
   async exchangeToken() {
-    const CLASSROOM_URL = process.env.VUE_APP_QUX_MC_CLASSROOM_URL;
+    const config = Services.getConfig();
+    const CLASSROOM_URL = config.classroomUrl;
+    if (!CLASSROOM_URL) {
+      this.logger.error('exchangeToken()', 'Classroom URL not found in config');
+      return null;
+    }
     try {
       this.logger.info('exchangeToken()', 'Attempting token exchange');
       const response = await fetch(`${CLASSROOM_URL}/api/auth/token-exchange`, {
@@ -54,7 +60,8 @@ class UserService extends AbstractService {
     this.user = this.GUEST;
 
     // Redirect to classroom on logout
-    const classroomUrl = process.env.VUE_APP_QUX_MC_CLASSROOM_URL;
+    const config = Services.getConfig();
+    const classroomUrl = config.classroomUrl || 'https://classroom.masterycoding.com';
     window.location.href = classroomUrl;
   }
 

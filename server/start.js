@@ -15,6 +15,7 @@ const auth = 'qux';
 const sharedLibs = process.env.QUX_SHARED_LIBS || '';
 const userAllowSignUp = process.env.QUX_USER_ALLOW_SIGNUP !== 'false';
 const userAllowedDomains = process.env.QUX_USER_ALLOWED_DOMAINS || '*';
+const classroomUrl = process.env.QUX_MC_CLASSROOM_URL;
 
 /**
  *
@@ -37,7 +38,8 @@ app.get('/config.json', (_req, res) => {
     user: {
       allowSignUp: userAllowSignUp,
       allowedDomains: userAllowedDomains
-    }
+    },
+    classroomUrl: classroomUrl
   });
 });
 
