@@ -117,12 +117,7 @@ services:
     image: klausenschaefersinho/quant-ux
     environment:
       - QUX_PROXY_URL=http://quant-ux-backend:8080 # this is the path the front end uses to talk tot he backend
-      - QUX_AUTH=qux
-      - QUX_KEYCLOAK_REALM=
-      - QUX_KEYCLOAK_CLIENT=
-      - QUX_KEYCLOAK_URL=
-      - QUX_WS_URL=ws://127.0.0.1:8086 # change to where the websocket server is deployed for external access
-      - VUE_APP_QUX_MC_CLASSROOM_URL=https://classroom.masterycoding.com # MasteryCoding Classroom URL (for authentication redirects)
+      - QUX_MC_CLASSROOM_URL=https://classroom.masterycoding.com # MasteryCoding Classroom URL (for authentication redirects)
     links:
       - mongo
       - qux-be
@@ -137,7 +132,6 @@ services:
     volumes:
       - ./quant-ux-data:/app-data
     environment:
-      - QUX_HTTP_HOST=http://quant-ux-frontend:8082 # this is the URL included in the mails, e.g. password resets
       - QUX_HTTP_PORT=8080 # This is the port the backend will use
       - QUX_MONGO_DB_NAME=quantux # the database / collection name in mongodb
       - QUX_MONGO_TABLE_PREFIX=quantux # table / document prefix in mongodb

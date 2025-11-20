@@ -19,4 +19,4 @@ COPY --chown=node:node [".", "./"]
 
 EXPOSE $QUX_HTTP_PORT
 
-CMD [ "npm", "run", "serve", "--", "--port", "9000", "--hostname", "qux.docker.localhost" ]
+CMD [ "npm", "run", "serve"]
