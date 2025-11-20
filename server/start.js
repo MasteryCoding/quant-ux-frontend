@@ -44,6 +44,14 @@ app.get('/config.json', (_req, res) => {
  * init proxy.
  */
 if (proxyUrl) {
+  console.log('Initializing proxy middleware for:', proxyUrl);
+
+  // Log all incoming requests to /rest/
+  app.use('/rest/', (req, res, next) => {
+    console.log('Incoming request:', req.method, req.url, 'from', req.ip);
+    next();
+  });
+
   app.use(
     '/rest/',
     proxyMiddleware.createProxyMiddleware({
@@ -53,15 +61,29 @@ if (proxyUrl) {
       timeout: 30000, // 30 seconds
       // Log proxy errors for debugging
       onError: (err, req, res) => {
-        console.error('Proxy error:', err.message);
+        console.error('Proxy error for:', req.url);
+        console.error('  Target:', proxyUrl);
+        console.error('  Error:', err.message);
+        console.error('  Code:', err.code);
+        console.error('  Stack:', err.stack);
         if (!res.headersSent) {
-          res.status(500).json({ error: 'Proxy error', message: err.message });
+          res.status(500).json({
+            error: 'Proxy error',
+            message: err.message,
+            code: err.code,
+            target: proxyUrl
+          });
         }
       },
-      // Handle connection errors gracefully
-      onProxyReq: (proxyReq) => {
+      // Log proxy requests
+      onProxyReq: (proxyReq, req) => {
+        console.log('Proxying request:', req.method, req.url, '->', proxyUrl + req.url);
         // Set longer timeout for internal service connections
         proxyReq.setTimeout(30000);
+      },
+      // Log proxy responses
+      onProxyRes: (proxyRes, req) => {
+        console.log('Proxy response:', req.url, '->', proxyRes.statusCode);
       }
     })
   );
@@ -99,7 +121,6 @@ module.exports = server.listen(port, function (err) {
   );
   console.debug('  \\/___/_/   \\/_____/   \\/_/\\/_/   \\/_/ \\/_/     \\/_/   \\/_____/   \\/_/\\/_/ ');
   console.log('Backend   : ' + proxyUrl);
-  console.log('Auth      : ' + auth);
   console.log('Domains   : ' + userAllowedDomains);
   if (classroomUrl) {
     console.log('Classroom : ' + classroomUrl);
