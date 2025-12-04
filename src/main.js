@@ -14,6 +14,7 @@ async function start() {
     await keycloakService.setConf(conf)
     await keycloakService.init();
   }
+  await Services.getUserService().load();
 
   Vue.use(VueI18n)
   Vue.config.productionTip = false
