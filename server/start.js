@@ -1,107 +1,162 @@
-const http = require('http')
-const express = require('express')
-const path = require('path')
-const compression = require('compression')
-const proxyMiddleware = require('http-proxy-middleware')
+const http = require('http');
+const express = require('express');
+const path = require('path');
+const compression = require('compression');
+const proxyMiddleware = require('http-proxy-middleware');
 
 /**
  * Some config stuff
  */
-const host = '0.0.0.0'
-const assetsRoot = path.resolve(__dirname, '../dist')
-const port = (process.env.QUX_HTTP_PORT * 1) || 8082
-const proxyUrl = process.env.QUX_PROXY_URL || 'https://v1.quant-ux.com'
-const wsUrl = process.env.QUX_WS_URL || 'wss://ws.quant-ux.com'
-const auth = process.env.QUX_AUTH || 'qux'
-const tos = process.env.QUX_TOS_URL || ''
-const keycloak_realm = process.env.QUX_KEYCLOAK_REALM || ''
-const keycloak_client = process.env.QUX_KEYCLOAK_CLIENT || ''
-const keycloak_url = process.env.QUX_KEYCLOAK_URL || ''
-const sharedLibs = process.env.QUX_SHARED_LIBS || ''
-const userAllowSignUp = process.env.QUX_USER_ALLOW_SIGNUP !== 'false'
-const userAllowedDomains = process.env.QUX_USER_ALLOWED_DOMAINS || '*'
+const assetsRoot = path.resolve(__dirname, '../dist');
+const port = process.env.QUX_HTTP_PORT * 1 || 9000;
+const proxyUrl = process.env.QUX_PROXY_URL;
+const auth = 'qux';
+const sharedLibs = process.env.QUX_SHARED_LIBS || '';
+const userAllowedDomains = process.env.QUX_USER_ALLOWED_DOMAINS || '*';
+const classroomUrl = process.env.QUX_MC_CLASSROOM_URL;
 
 /**
  *
  * Init express
  */
-var app = express()
+var app = express();
 
-/** 
+/**
  * Add compression
  */
-app.use(compression())
+app.use(compression());
 
-
-/** 
+/**
  * make config dynamic on env variables
  */
-app.get("/config.json", (_req, res) => {
+app.get('/config.json', (_req, res) => {
   res.send({
-    "auth": auth,
-    "websocket": wsUrl,
-    "tos": tos,
-    "sharedLibs": sharedLibs,
-    "user": {
-      "allowSignUp": userAllowSignUp,
-      "allowedDomains": userAllowedDomains
+    auth: auth,
+    sharedLibs: sharedLibs,
+    user: {
+      allowedDomains: userAllowedDomains
     },
-    "keycloak": {
-      "realm": keycloak_realm,
-      "clientId": keycloak_client,
-      "url": keycloak_url
-    }
-  })
-})
+    classroomUrl: classroomUrl
+  });
+});
 
 /**
  * init proxy.
  */
-app.use('/rest/', proxyMiddleware.createProxyMiddleware({
-    target: proxyUrl,
-    changeOrigin: true
-}))
+if (proxyUrl) {
+  console.log('Initializing proxy middleware for:', proxyUrl);
 
-app.use('/ai/', proxyMiddleware.createProxyMiddleware({
-  target: proxyUrl,
-  changeOrigin: true
-}))
+  // Log all incoming requests to /rest/
+  app.use('/rest/', (req, res, next) => {
+    console.log('Incoming request:', req.method, req.url, 'from', req.ip);
+    next();
+  });
 
+  app.use(
+    '/rest/',
+    proxyMiddleware.createProxyMiddleware({
+      target: proxyUrl,
+      changeOrigin: true,
+      // For Kubernetes internal services, increase timeout to handle potential DNS resolution delays
+      timeout: 30000, // 30 seconds
+      // Log proxy errors for debugging
+      onError: (err, req, res) => {
+        console.error('Proxy error for:', req.url);
+        console.error('  Target:', proxyUrl);
+        console.error('  Error:', err.message);
+        console.error('  Code:', err.code);
+        console.error('  Stack:', err.stack);
+        if (!res.headersSent) {
+          res.status(500).json({
+            error: 'Proxy error',
+            message: err.message,
+            code: err.code,
+            target: proxyUrl
+          });
+        }
+      },
+      // Log proxy requests
+      onProxyReq: (proxyReq, req) => {
+        console.log('Proxying request:', req.method, req.url, '->', proxyUrl + req.url);
+        // Set longer timeout for internal service connections
+        proxyReq.setTimeout(30000);
+      },
+      // Log proxy responses
+      onProxyRes: (proxyRes, req) => {
+        console.log('Proxy response:', req.url, '->', proxyRes.statusCode);
+      }
+    })
+  );
+} else {
+  console.warn('WARNING: QUX_PROXY_URL not set. Proxy middleware not initialized.');
+  // Return 503 for /rest/ requests if proxy is not configured
+  app.use('/rest/', (_req, res) => {
+    res.status(503).json({ error: 'Backend proxy not configured. QUX_PROXY_URL environment variable is required.' });
+  });
+}
 
 /**
  * Setup static to serve all html, js and images from server/dist
  */
-app.use(express.static(assetsRoot))
-
+app.use(express.static(assetsRoot));
 
 /**
  * Create the server
  */
-var server = http.createServer(app)
-
+var server = http.createServer(app);
 
 // Finish application create.
 module.exports = server.listen(port, function (err) {
   if (err) {
-    console.log(err)
-    return
+    console.log(err);
+    return;
   }
-  console.debug(' ______     __  __     ______     __   __     ______   __  __     __  __')
-  console.debug('/\\  __ \\   /\\ \\/\\ \\   /\\  __ \\   /\\ "-.\\ \\   /\\__  _\\ /\\ \\/\\ \\   /\\_\\_\\_\\ ')
-  console.debug('\\ \\ \\/\\_\\  \\ \\ \\_\\ \\  \\ \\  __ \\  \\ \\ \\-.  \\  \\/_/\\ \\/ \\ \\ \\_\\ \\  \\/_/\\_\\/_')
-  console.debug(' \\ \\___\\_\\  \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\\\"\\_\\    \\ \\_\\  \\ \\_____\\   /\\_\\/\\_\\ ')
-  console.debug('  \\/___/_/   \\/_____/   \\/_/\\/_/   \\/_/ \\/_/     \\/_/   \\/_____/   \\/_/\\/_/ ')
-  console.log('Listening on ' + host + ':' + server.address().port)
-  console.log('Backend   : ' + proxyUrl)
-  console.log('WebSocket : ' + wsUrl)
-  console.log('Auth      : ' + auth)
-  console.log('SignUp    : ' + userAllowSignUp)
-  console.log('Domains   : ' + userAllowedDomains)
-})
+  console.debug(' ______     __  __     ______     __   __     ______   __  __     __  __');
+  console.debug('/\\  __ \\   /\\ \\/\\ \\   /\\  __ \\   /\\ "-.\\ \\   /\\__  _\\ /\\ \\/\\ \\   /\\_\\_\\_\\ ');
+  console.debug(
+    '\\ \\ \\/\\_\\  \\ \\ \\_\\ \\  \\ \\  __ \\  \\ \\ \\-.  \\  \\/_/\\ \\/ \\ \\ \\_\\ \\  \\/_/\\_\\/_'
+  );
+  console.debug(
+    ' \\ \\___\\_\\  \\ \\_____\\  \\ \\_\\ \\_\\  \\ \\_\\\\"\\_\\    \\ \\_\\  \\ \\_____\\   /\\_\\/\\_\\ '
+  );
+  console.debug('  \\/___/_/   \\/_____/   \\/_/\\/_/   \\/_/ \\/_/     \\/_/   \\/_____/   \\/_/\\/_/ ');
+  console.log('Backend   : ' + proxyUrl);
+  console.log('Domains   : ' + userAllowedDomains);
+  if (classroomUrl) {
+    console.log('Classroom : ' + classroomUrl);
+  }
+  console.log('PRODUCTION MODE');
 
+  // Test backend connectivity if proxy is configured
+  if (proxyUrl) {
+    try {
+      const parsedUrl = new URL(proxyUrl);
+      const options = {
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port || (parsedUrl.protocol === 'https:' ? 443 : 80),
+        path: '/health',
+        method: 'GET',
+        timeout: 5000
+      };
 
+      const req = http.request(options, (res) => {
+        console.log('Backend connectivity: OK (status ' + res.statusCode + ')');
+      });
 
+      req.on('error', (err) => {
+        console.warn('Backend connectivity: WARNING - Could not reach backend at ' + proxyUrl);
+        console.warn('  Error: ' + err.message);
+        console.warn('  This may be normal if the backend is not yet ready or uses a different health endpoint');
+      });
 
+      req.on('timeout', () => {
+        req.destroy();
+        console.warn('Backend connectivity: WARNING - Timeout connecting to backend');
+      });
 
-
-
+      req.end();
+    } catch (err) {
+      console.warn('Backend connectivity: Could not parse proxy URL: ' + err.message);
+    }
+  }
+});
