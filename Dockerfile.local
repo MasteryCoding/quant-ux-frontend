@@ -1,0 +1,22 @@
+ARG NODE_VERSION=16
+ARG ALPINE_VERSION=
+
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS dependencies
+
+USER node
+WORKDIR /home/node
+
+COPY --chown=node:node ["package*.json", "./"]
+RUN npm clean-install
+
+FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS runtime
+
+USER node
+WORKDIR /home/node
+
+COPY --chown=node:node --from=dependencies ["/home/node/node_modules", "node_modules/"]
+COPY --chown=node:node [".", "./"]
+
+EXPOSE $QUX_HTTP_PORT
+
+CMD [ "npm", "run", "serve"]
