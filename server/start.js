@@ -30,14 +30,16 @@ app.use(compression());
  * make config dynamic on env variables
  */
 app.get('/config.json', (_req, res) => {
-  res.send({
+  const config = {
     auth: auth,
     sharedLibs: sharedLibs,
     user: {
       allowedDomains: userAllowedDomains
     },
-    classroomUrl: classroomUrl
-  });
+    classroomUrl: classroomUrl || null
+  };
+  console.log('Serving config.json:', JSON.stringify(config, null, 2));
+  res.send(config);
 });
 
 /**
