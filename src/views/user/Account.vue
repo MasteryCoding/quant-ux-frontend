@@ -8,60 +8,29 @@
           <h2>My Account</h2>
 
           <p class="MatcLead MatcMarginBottomXL">
-            Change your personal settings here!
+            View your account information
           </p>
           <div class="row">
 
             <div class="col-md-8 " v-if="isQuxAuth">
-              <div data-dojo-type="de/vommond/Form">
-
-                <div class="form-group MatcHoverHint" @dblclick="isEmailDisabled = false">
-                  <label>
-                    Email <span class="MatcHint" v-if="isEmailDisabled">(double click to edit)</span>
-                  </label>
-
-                  <input type="email" class="form-control" ref="emailField" :disabled="isEmailDisabled"
-                    v-model="user.email" placeholder="Your email" />
+              <div class="MatcAccountInfo">
+                <div class="form-group">
+                  <label>Email</label>
+                  <div class="MatcAccountValue">{{ user.email || 'Not set' }}</div>
                 </div>
 
                 <div class="form-group">
                   <label>Name</label>
-                  <input type="email" class="form-control" v-model="user.name" placeholder="Enter your name"
-                    data-binding-required="true">
+                  <div class="MatcAccountValue">{{ user.name || 'Not set' }}</div>
                 </div>
 
                 <div class="form-group">
                   <label>Lastname</label>
-                  <input type="email" class="form-control" v-model="user.lastname" placeholder="Enter your lastname"
-                    data-binding-required="true">
+                  <div class="MatcAccountValue">{{ user.lastname || 'Not set' }}</div>
                 </div>
 
-                <div class="form-group">
-                  <label>Homepage</label>
-                  <input type="text" class="form-control" v-model="user.homepage" placeholder="http://www.yourpage.com">
-                </div>
-
-                <div class="form-group">
-                  <label>Password</label>
-                  <input type="password" class="form-control" v-model="password"
-                    placeholder="To change, enter new password">
-                </div>
-
-
-                <div class="form-group">
-                  <label>Newsletter</label>
-                  <div>
-                    <CheckBox v-model="user.newsletter" label="I want to receive the newsletter" />
-                  </div>
-                </div>
-
-                <div class="MatcErrorLabel">
+                <div class="MatcErrorLabel" v-if="error">
                   {{ error }}
-                </div>
-
-                <div class="MatcButtonBar">
-                  <a class="MatcButton" @click="save">Save</a>
-                  <a class="MatcLinkButton" href="#/apps/my-apps.html">Cancel</a>
                 </div>
               </div>
             </div>
@@ -69,10 +38,6 @@
               <p class="MatcLead MatcMarginBottomXL">
                 Your credentials are managed in Keycloak. Contact your admin for help.
               </p>
-            </div>
-            <div class="col-md-2 col-md-offset-1 visible-md-block visible-lg-block">
-              <Label>Image</Label>
-              <UserImage :user="user" @change="onImageChanged"/>
             </div>
    
           </div>
@@ -103,28 +68,17 @@ import DomBuilder from 'common/DomBuilder'
 import Logger from "common/Logger";
 import DojoWidget from "dojo/DojoWidget";
 import Services from "services/Services";
-import CheckBox from "common/CheckBox.vue";
-import UserImageUploader from "page/UserImageUploader.vue";
-
 export default {
-  name: "Finish",
+  name: "Account",
   mixins: [DojoWidget],
   data: function () {
     return {
-      isEmailDisabled: true,
-      password: '',
       error: '',
-      user: null,
-      errorHomepage: false,
-      errorName: false,
-      errorLastName: false
+      user: null
     };
   },
   watch: {},
-  components: {
-    'CheckBox': CheckBox,
-    'UserImage': UserImageUploader
-  },
+  components: {},
   computed: {
     isQuxAuth() {
       return Services.getConfig().auth !== 'keycloak'
@@ -175,101 +129,60 @@ export default {
       );
     },
 
-    confirm() {
-      return new Promise(resolve => {
-        const db = new DomBuilder();
-        const dialog = db.div("MatcDialog").build();
-
-        const name = this.user.name ? this.user.name : this.user.email;
-        const message = this.getNLS("user.change.email") + this.user.email
-
-        db.h3("", this.getNLS("user.change.hi") + name + ",")
-          .build(dialog);
-
-        db.div("MatcMarginTop", message, true)
-          .build(dialog);
-
-        const bar = db
-          .div("MatcButtonBar MatcMarginTopXXL")
-          .build(dialog);
-
-        const save = db
-          .a("MatcButton MatcButtonRed", this.getNLS("btn.save"))
-          .build(bar);
-
-        const cancel = db
-          .a("MatcLinkButton", this.getNLS("btn.cancel"))
-          .build(bar);
-
-        const d = new Dialog();
-        d.popup(dialog, this.$refs.emailField);
-        d.own(on(save, "click", () => {
-          resolve(true)
-          d.close()
-        }))
-        d.own(on(cancel, "click", () => {
-          d.close();
-        }))
-        d.on("close", () => {
-          resolve(false)
-        });
-      })
-    },
-
-    async save() {
-      this.logger.log(0, "save", "entry");
-      const data = {
-        name: this.user.name,
-        lastname: this.user.lastname,
-        homepage: this.user.homepage,
-        newsletter: this.user.newsletter
-      };
-
-      if (this.orginalEmail !== this.user.email) {
-        const sure = await this.confirm()
-        if (!sure) {
-          return
-        }
-        data.email = this.user.email
-      }
-
-      if (this.password > 0) {
-        if (this.password.length < 6) {
-          console.warn("Password too short");
-          this.error = "The password must have at least 6 characters";
-          return;
-        } else {
-          data.password = this.password;
-        }
-      }
-
-      const result = await Services.getUserService().save(this.user._id, data);
-      if (result.errors) {
-        this.logger.error("save", "Email taken", this.user.email);
-        this.showError("Email is taken...");
-        this.error = "The email is already taken";
-      } else {
-        this.$root.$emit("user", result);
-        this.showSuccess("Account updated");
-      }
-    },
-
-    onImageChanged () {
-      this.showSuccess("Image changed");
-      // fixme, we should actually update the user
-    },
   },
   async mounted() {
     this.logger = new Logger("Finish");
-    let user = Services.getUserService().load()
-    Services.getUserService()
-      .loadById(user.id)
-      .then(full => {
-        this.user = full;
-        this.orginalEmail = this.user.email
-        this.logger.info("mounted", "exit >> " + this.user.email);
-      });
+    const userService = Services.getUserService();
+    let user = userService.getUser();
+    
+    // If user not available, try to load it
+    if (!user || (user.role === 'guest')) {
+      this.logger.info("mounted", "User not loaded, attempting to load");
+      user = await userService.load();
+    }
+    
+    // Get the user ID (could be id or _id)
+    const userId = user?.id || user?._id;
+    
+    if (!userId) {
+      this.logger.error("mounted", "User ID not found", user);
+      this.error = "User not found. Please login again.";
+      return;
+    }
+    
+    try {
+      const full = await userService.loadById(userId);
+      this.user = full;
+      this.logger.info("mounted", "exit >> " + this.user.email);
+    } catch (error) {
+      this.logger.error("mounted", "Error loading user", error);
+      this.error = "Error loading user data. Please try again.";
+    }
   }
 };
 </script>
 
+<style lang="scss" scoped>
+.MatcAccountInfo {
+  .form-group {
+    margin-bottom: 24px;
+    
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #363636;
+    }
+  }
+  
+  .MatcAccountValue {
+    padding: 10px 12px;
+    background-color: #f5f5f5;
+    border: 1px solid #dbdbdb;
+    border-radius: 4px;
+    color: #363636;
+    font-size: 16px;
+    min-height: 20px;
+  }
+}
+</style>

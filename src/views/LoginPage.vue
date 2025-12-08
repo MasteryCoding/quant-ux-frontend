@@ -1,261 +1,147 @@
 <template>
-    <div :class="'MatcLoginPage ' + (resetToken ? 'MatcLoginPageReset' : 'MactMainGradient')">
-        <div class="MatcLoginPageDialog" v-if="isQuxAuth">
-        
-                <div class="MatcLoginPageContainer">
-                    <div class="MatcToolbarTabs MatcToolbarTabsBig" v-if="!resetToken">
-                        <a :class="{'MatcToolbarTabActive': tab === 'login'}" @click="setTab('login')">Login</a>
-                        <a :class="{'MatcToolbarTabActive': tab === 'signup'}" @click="setTab('signup')" v-if="allowSignUp">Sign Up</a>
-                    </div>
-
-                    <div :class="' MatcLoginWrapper ' + tab ">
-                        <div class="MatcLoginContent">
-                            <div class="MatcLoginPageSection" >
-                                <div class="MatcLoginPageForm">
-                                    <div class=" form-group">
-                                        <label class="">Email</label>
-                                        <input class=" form-control" placeholder="Your email" type="text" v-model="email">
-                                    </div>
-
-                                    <div class=" form-group has-feedback">
-                                        <label class="">Password</label>
-                                        <input class=" form-control" placeholder="Your password" type="password" v-model="password" @keyup.enter="login">
-                                    </div>
-                                    
-                                </div>
-                          
-                                <div class="MatcButtonBar MatMarginTopXL">
-                                    <a class="MatcButton MatcButtonPrimary" @click="login">Login</a>
-                                    <a class="MatcLinkButton" @click="requestPasswordReset" v-if="hasLoginError">Reset Password</a>
-                                    <span class="MatcErrorLabel" v-show="errorMessage">{{errorMessage}}</span>
-                                </div>
-                            </div>
-                        </div> <!-- login-->
-                        
-                     
-
-                        <div class="MatcLoginContent">
-                            <div class="MatcLoginPageSection">
-                                <div class="MatcLoginPageForm">
-                                    <div class=" form-group">
-                                        <label class="">Email</label>
-                                        <input class=" form-control" placeholder="Your email" type="text" v-model="email">
-                                    </div>
-
-                                    <div class=" form-group has-feedback">
-                                        <label class="">Password</label>
-                                        <input class=" form-control" placeholder="Your password" type="password" v-model="password" @keyup.enter="signup">
-                                    </div>
-                                    <div class=" form-group has-feedback" >
-                                        <div class="MatcCheckboxRow">
-                                        <CheckBox v-model="tos" label=""/>
-                                        <span @click="tos=true">I accept the <a href="#/tos.html" target="_blank">terms of service</a></span>
-                                        </div>
-                                    </div>
-                                   
-                                </div>
-                                
-                                <div class="MatcButtonBar">
-                                    <a class="MatcButton MatcButtonPrimary" @click="signup">SignUp</a>
-                                    <span class="MatcErrorLabel">{{errorMessage}}</span>
-                                </div>
-                            </div>
-                        </div> <!-- new -->
-
-                        <div class="MatcLoginContent">
-                              <div class="MatcLoginPageSection" v-if="resetToken">
-                                <div class="MatcLoginPageForm">
-                                    <div class=" form-group">
-                                        <label class="">Email</label>
-                                        <input class=" form-control" placeholder="Your email" type="text" v-model="email">
-                                    </div>
-
-                                    <div class=" form-group has-feedback">
-                                        <label class="">New Password</label>
-                                        <input class=" form-control" placeholder="The new password" type="password" v-model="password">
-                                    </div>
-                                </div>
-                                <span class="MatcErrorLabel" >{{errorMessage}}</span>
-                                <div class="MatcButtonBar">
-                                    <a class="MatcButton MatcButtonDanger" @click="resetPassword">Set new password</a>                                
-                                </div>
-                            </div> 
-                        </div><!-- reset-->
-
-    
-
-                    </div> <!-- end wrapper-->
-
-        
-            </div> <!-- Container -->
-            
-          
-        </div> <!-- Dialog -->
-
-       
+    <div class="MatcLoginPage MactMainGradient">
+        <div class="MatcLoginPageDialog">
+            <div class="MatcLoginPageContainer">
+                <div class="MatcLoginLoader">
+                    <div class="MatcLoginLoaderSpinner"></div>
+                    <div class="MatcLoginLoaderText">Authenticating...</div>
+                </div>
+            </div>
+        </div>
     </div>
-
 </template>
 
 
 <style lang="scss">
     @import "../style/components/login.scss";
     @import '../style/toolbar/tab.scss';
+
+    .MatcLoginLoader {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        padding: 40px;
+    }
+
+    .MatcLoginLoaderSpinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+
+    .MatcLoginLoaderText {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 
 <script>
-
-
 import Services from 'services/Services'
 import Logger from 'common/Logger'
-import CheckBox from '../common/CheckBox.vue'
 
 export default {
-  name: "Header",
+  name: "LoginPage",
   mixins: [],
   props: ['user'],
   data: function() {
     return {
-        hasLoginError: false,
-        resetToken: false,
-        email: '',
-        password: '',
-        tos: false,
-        errorMessage: ' ',
-        signupInProgress: false,
-        tab: 'login',
-        config: {}
-    }
-  },
-  computed: {
-    isQuxAuth () {
-        return Services.getConfig().auth !== 'keycloak'
-    },
-    allowSignUp () {
-        return this.config && this.config.user && this.config.user.allowSignUp === true
+        isAuthenticating: true,
+        checkInterval: null
     }
   },
   watch: {
     'user' (v) {
-      this.logger.log(6, 'watch', 'user >> ' + v.email)
-      this.user = v
+      this.logger.log(6, 'watch', 'user >> ' + (v ? v.email : 'null'))
+      this.checkAuthentication()
     }
   },
-  components: {
-    CheckBox
-  },
   methods: {
-      setTab (tab) {
-        this.tab = tab
-        this.errorMessage = ' '
-      },
-      async resetPassword () {
-        this.logger.info('resetPassword', 'enter ', this.email)
-
-        if (this.email.length < 2) {
-            this.errorMessage = "Please enter your email"
-            return;
-        }
-
-        if (this.password.length < 6) {
-            this.errorMessage = "Password too short"
-            return;
-        }
-
-        if (this.resetToken.length < 6) {
-            this.errorMessage = "Token is wrong"
-            return;
-        }
-
-        let result = await Services.getUserService().reset2(this.email, this.password, this.resetToken)
-        if (result.type === 'error') {
-            this.errorMessage = 'Someything is wrong'
-        } else {
-            this.errorMessage = ''
-            this.resetToken = ''
-            this.tab = 'login'
-            this.$router.push('/')
-        }
- 
-      },
-      async requestPasswordReset () {
-        this.logger.info('requestPasswordReset', 'enter ', this.email)
-        await Services.getUserService().reset(this.email)
-        this.errorMessage = 'Check you mail.'
-      },
-      async login () {
-        this.logger.info('login', 'enter ', this.email)
-        var result = await Services.getUserService().login({
-            email:this.email,
-            password: this.password
-        })
-        if (result.type == "error") {
-            this.$root.$emit("Error", "Wrong login credentials")
-            this.errorMessage = "Login is wrong"
-            this.hasLoginError = true
-        } else {
-            this.$emit('login', result);
-            this.$root.$emit('UserLogin', result)
-            this.hasLoginError = false
+      checkAuthentication() {
+        const userService = Services.getUserService()
+        const currentUser = userService.getUser()
+        
+        // Check if user is authenticated (not a guest)
+        if (currentUser && currentUser.role && currentUser.role !== 'guest') {
+          this.logger.info('checkAuthentication', 'User authenticated: ' + currentUser.email)
+          this.isAuthenticating = false
+          if (this.checkInterval) {
+            clearInterval(this.checkInterval)
+            this.checkInterval = null
+          }
+          // Emit login event to parent component
+          this.$emit('login', currentUser)
+          this.$root.$emit('UserLogin', currentUser)
         }
       },
-      async signup() {
-        this.logger.info('signup', 'enter ', this.email)
-
-        if (this.signupInProgress) {
-            this.logger.info('signup', 'already in progress')
-            return;
-        }
-
-     
-        if (this.password.length < 6) {
-            this.errorMessage = "Password too short"
-            return;
-        }
-
-        if (this.tos !== true) {
-            this.errorMessage = "Please accept terms of service"
-            return;
-        }
-
-        this.signupInProgress = true
-        var result = await Services.getUserService().signup({
-            email:this.email,
-            password: this.password,
-            tos: this.tos
-        })
-        this.signupInProgress = false
-        if (result.type == "error") {
-            if (result.errors.indexOf("user.create.domain") >= 0) {
-                this.errorMessage = "Not the correct domain"
-            } else if (result.errors.indexOf("user.create.nosignup") >=0 ) {
-                this.errorMessage = "No sign-ups allowed."
-            } else if (result.errors.indexOf("user.email.not.unique") >= 0) {
-                this.errorMessage = "Email is taken"
-            } else {
-                this.errorMessage = "Password too short"
-            }
-        } else {
-            let user = await Services.getUserService().login({
-                email:this.email,
-                password: this.password,
-            })
-            this.$emit('login', user);
+      async attemptAuthentication() {
+        this.logger.info('attemptAuthentication', 'Starting authentication')
+        this.isAuthenticating = true
+        
+        try {
+          // Try to load/authenticate user
+          const userService = Services.getUserService()
+          const user = await userService.load()
+          
+          this.logger.info('attemptAuthentication', 'Load completed, user: ' + (user ? user.email : 'null'))
+          
+          // Check if authentication was successful
+          if (user && user.role && user.role !== 'guest') {
+            this.logger.info('attemptAuthentication', 'Authentication successful')
+            this.isAuthenticating = false
+            this.$emit('login', user)
             this.$root.$emit('UserLogin', user)
-            this.logger.log(-1,'signup', 'exit with login', this.email)
+          } else {
+            this.logger.info('attemptAuthentication', 'Still guest, will continue checking')
+            // Continue checking periodically
+            this.startPeriodicCheck()
+          }
+        } catch (error) {
+          this.logger.error('attemptAuthentication', 'Error during authentication', error)
+          // Continue checking periodically even on error
+          this.startPeriodicCheck()
         }
+      },
+      startPeriodicCheck() {
+        // Check every 2 seconds if user becomes authenticated
+        if (this.checkInterval) {
+          clearInterval(this.checkInterval)
+        }
+        this.checkInterval = setInterval(() => {
+          this.checkAuthentication()
+        }, 2000)
       }
   },
   async mounted() {
     this.logger = new Logger('LoginPage')
-   	this.resetToken = this.$route.query.id
-    if (this.resetToken && this.resetToken.length > 2) {
-        this.logger.log(-1,'mounted', 'reset ')
-        this.tab = 'reset'
+    this.logger.log(1, 'mounted', 'Starting authentication flow')
+    
+    // Start authentication attempt
+    await this.attemptAuthentication()
+    
+    // Also watch for user prop changes
+    if (this.user) {
+      this.checkAuthentication()
     }
-
-    this.config = Services.getConfig()
-    this.logger.log(1,'mounted', 'exit > ')
+  },
+  beforeDestroy() {
+    if (this.checkInterval) {
+      clearInterval(this.checkInterval)
+      this.checkInterval = null
+    }
   }
 }
 </script>
