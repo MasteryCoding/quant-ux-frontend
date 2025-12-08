@@ -56,33 +56,38 @@ module.exports = {
     // HMR configuration for Docker
     // Enable hot module replacement
     hot: true,
+    liveReload: false, // Disable live reload, use HMR instead
+    // WebSocket server configuration
+    webSocketServer: {
+      type: 'ws',
+      options: {
+        host: '0.0.0.0',
+        port: process.env.QUX_HTTP_PORT ? parseInt(process.env.QUX_HTTP_PORT) : 9000,
+      },
+    },
     // Client configuration for HMR WebSocket connection
     client: {
       // WebSocket URL - tell client where to connect for HMR
-      // Use 'auto' to detect, or set QUX_DEV_HOSTNAME env var for Docker
+      // For Docker, we need to explicitly set the hostname and port the browser can reach
       webSocketURL: process.env.QUX_DEV_HOSTNAME 
-        ? {
-            hostname: process.env.QUX_DEV_HOSTNAME,
-            pathname: '/ws',
-            port: process.env.QUX_HTTP_PORT ? parseInt(process.env.QUX_HTTP_PORT) : 9000,
-            protocol: 'ws',
-          }
-        : 'auto',
+        ? `ws://${process.env.QUX_DEV_HOSTNAME}:${process.env.QUX_HTTP_PORT || 9000}/ws`
+        : undefined, // Let webpack-dev-server auto-detect
       // Enable HMR overlay for errors
       overlay: {
         errors: true,
         warnings: false,
       },
+      // Enable logging for debugging
+      logging: 'info',
+      // Progress indicator
+      progress: true,
     },
     // Use 'onBeforeSetupMiddleware' for webpack-dev-server compatibility
     onBeforeSetupMiddleware: function(devServer) {
       console.log('Setting up /config.json route in onBeforeSetupMiddleware hook');
       // Serve dynamic config.json from environment variables
       devServer.app.get('/config.json', function(req, res) {
-        console.log('[/config.json] Request received, serving dynamic config');
-        console.log('Environment check - QUX_MC_CLASSROOM_URL:', process.env.QUX_MC_CLASSROOM_URL);
         const config = getConfig();
-        console.log('Sending config:', JSON.stringify(config, null, 2));
         res.json(config);
       });
     },
@@ -94,6 +99,14 @@ module.exports = {
         changeOrigin: true
       },
     }
+  },
+  configureWebpack: {
+    // File watching configuration for Docker
+    watchOptions: {
+      poll: 1000, // Check for changes every second (required for Docker volumes)
+      aggregateTimeout: 300, // Delay before rebuilding once the first file changed
+      ignored: /node_modules/, // Don't watch node_modules
+    },
   },
   chainWebpack: config => {
     config.resolve.alias.set('src', path.resolve('src'))
