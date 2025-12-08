@@ -20,7 +20,6 @@
       </div>
       <div class="MatcHeaderRight">
    
-          <LanguagePicker @change="setLanguage" />
         <!--  
           <a class="" href="#/help.html">
             <QIcon icon="Book" :tooltip="$t('header.tooltip.documentation')"/>
@@ -32,10 +31,6 @@
         </a>
         <a class="" href="#/logout.html">{{ $t('header.logout') }}</a>
       -->
-       
-        <a class="" href="#/logout.html">
-          <QIcon icon="Logout"/>
-        </a>
        
       </div>
 
@@ -49,12 +44,8 @@
 
 <script>
 
-import Services from 'services/Services'
 import Logger from 'common/Logger'
-import hash from "dojo/hash";
-import LanguagePicker from "page/LanguagePicker";
 // import AccountButton from 'page/AccountButton'
-import QIcon from 'page/QIcon'
 import _Tooltip from "common/_Tooltip";
 
 export default {
@@ -72,25 +63,9 @@ export default {
     }
   },
   components: {
-    'LanguagePicker': LanguagePicker,
-    'QIcon': QIcon,
     // 'AccountButton': AccountButton
   },
   methods: {
-    setLanguage(language) {
-      this.logger.log(-1, "setLanguage", "entry", language);
-      Services.getUserService().setLanguage(language)
-      this.$root.$i18n.locale = language
-      this.$root.$emit('Success', this.$i18n.t('common.language-changed'))
-
-    },
-
-    logout() {
-      this.logger.log(2, "logout", "entry");
-      Services.getUserService().logout()
-      this.$emit('logout', Services.getUserService().GUEST)
-      hash("/", true);
-    }
   },
   async mounted() {
     this.logger = new Logger('Header')
