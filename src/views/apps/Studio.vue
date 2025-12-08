@@ -56,10 +56,6 @@
                     </div>
 
                     <div class="MatcStudioNavRow">
-                        <StudioNotification :user="user"/>
-                    </div>
-
-                    <div class="MatcStudioNavRow">
                         <a class="MatcLink MatcStudioNavItem" href="#/help.html">
                             <QIcon icon="Book"/>
                             <span class="MatcCollapseViewMinHidden">
@@ -137,7 +133,6 @@ import StudioOverview from './StudioOverview'
 import CreateAppDialog from "page/CreateAppDialog";
 import QIcon from "page/QIcon";
 import AppListDialog from './AppListDialog'
-import StudioNotification from './StudioNotification'
 import StudioContact from './StudioContact'
 
 export default {
@@ -157,7 +152,6 @@ export default {
         'CreateAppDialog': CreateAppDialog,
         'QIcon': QIcon,
         'AppListDialog': AppListDialog,
-        'StudioNotification': StudioNotification,
         'StudioContact': StudioContact
     },
     computed: {
