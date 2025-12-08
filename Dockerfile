@@ -50,4 +50,4 @@ WORKDIR /home/node
 
 COPY --chown=node:node --from=builder ["/home/node", "./"]
 
-CMD [ "npm", "run", "serve", "--", "--port", "8082" ]
+CMD [ "npm", "run", "serve"]
